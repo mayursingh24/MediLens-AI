@@ -17,16 +17,22 @@ class Config:
     TEMPLATES_AUTO_RELOAD = True
 
     # MySQL Configuration
-    MYSQL_HOST = os.getenv("MYSQL_HOST", "localhost")
-    MYSQL_PORT = int(os.getenv("MYSQL_PORT", 3306))
-    MYSQL_USER = os.getenv("MYSQL_USER", "root")
-    MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "")
-    MYSQL_DATABASE = os.getenv("MYSQL_DATABASE", "medilens")
+    DATABASE_URL = os.getenv("DATABASE_URL")
+    if DATABASE_URL:
+        if DATABASE_URL.startswith("mysql://"):
+            DATABASE_URL = DATABASE_URL.replace("mysql://", "mysql+pymysql://", 1)
+        SQLALCHEMY_DATABASE_URI = DATABASE_URL
+    else:
+        MYSQL_HOST = os.getenv("MYSQL_HOST", "localhost")
+        MYSQL_PORT = int(os.getenv("MYSQL_PORT", 3306))
+        MYSQL_USER = os.getenv("MYSQL_USER", "root")
+        MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "")
+        MYSQL_DATABASE = os.getenv("MYSQL_DATABASE", "medilens")
 
-    _password_encoded = urllib.parse.quote_plus(MYSQL_PASSWORD)
-    SQLALCHEMY_DATABASE_URI = (
-        f"mysql+pymysql://{MYSQL_USER}:{_password_encoded}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}?charset=utf8mb4"
-    )
+        _password_encoded = urllib.parse.quote_plus(MYSQL_PASSWORD)
+        SQLALCHEMY_DATABASE_URI = (
+            f"mysql+pymysql://{MYSQL_USER}:{_password_encoded}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}?charset=utf8mb4"
+        )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_recycle": 280,
@@ -45,8 +51,9 @@ class Config:
     MAPS_API_KEY = os.getenv("MAPS_API_KEY", "")
 
     # Tesseract and Poppler configuration
-    TESSERACT_CMD = os.getenv("TESSERACT_CMD", r"C:\Program Files\Tesseract-OCR\tesseract.exe")
-    POPPLER_PATH = os.getenv("POPPLER_PATH", r"C:\poppler\poppler-26.02.0\Library\bin")
+    _is_windows = os.name == "nt"
+    TESSERACT_CMD = os.getenv("TESSERACT_CMD", r"C:\Program Files\Tesseract-OCR\tesseract.exe" if _is_windows else "tesseract")
+    POPPLER_PATH = os.getenv("POPPLER_PATH", r"C:\poppler\poppler-26.02.0\Library\bin" if _is_windows else "")
 
     # Logging
     LOG_DIR = BASE_DIR / "logs"
