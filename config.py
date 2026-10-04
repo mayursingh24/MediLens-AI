@@ -16,18 +16,18 @@ class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "medilens-ai-default-insecure-secret-key-change-me")
     TEMPLATES_AUTO_RELOAD = True
 
-    # MySQL Configuration
-    DATABASE_URL = os.getenv("DATABASE_URL")
-    if DATABASE_URL:
-        if DATABASE_URL.startswith("mysql://"):
-            DATABASE_URL = DATABASE_URL.replace("mysql://", "mysql+pymysql://", 1)
-        SQLALCHEMY_DATABASE_URI = DATABASE_URL
+    # MySQL Configuration: Auto-detects Railway, Docker, and standard env variables
+    raw_db_url = os.getenv("DATABASE_URL") or os.getenv("MYSQL_URL") or os.getenv("MYSQL_PUBLIC_URL")
+    if raw_db_url and not raw_db_url.startswith("${{"):
+        if raw_db_url.startswith("mysql://"):
+            raw_db_url = raw_db_url.replace("mysql://", "mysql+pymysql://", 1)
+        SQLALCHEMY_DATABASE_URI = raw_db_url
     else:
-        MYSQL_HOST = os.getenv("MYSQL_HOST", "localhost")
-        MYSQL_PORT = int(os.getenv("MYSQL_PORT", 3306))
-        MYSQL_USER = os.getenv("MYSQL_USER", "root")
-        MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "")
-        MYSQL_DATABASE = os.getenv("MYSQL_DATABASE", "medilens")
+        MYSQL_HOST = os.getenv("MYSQLHOST") or os.getenv("MYSQL_HOST", "localhost")
+        MYSQL_PORT = int(os.getenv("MYSQLPORT") or os.getenv("MYSQL_PORT", 3306))
+        MYSQL_USER = os.getenv("MYSQLUSER") or os.getenv("MYSQL_USER", "root")
+        MYSQL_PASSWORD = os.getenv("MYSQLPASSWORD") or os.getenv("MYSQL_PASSWORD", "")
+        MYSQL_DATABASE = os.getenv("MYSQLDATABASE") or os.getenv("MYSQL_DATABASE", "railway")
 
         _password_encoded = urllib.parse.quote_plus(MYSQL_PASSWORD)
         SQLALCHEMY_DATABASE_URI = (

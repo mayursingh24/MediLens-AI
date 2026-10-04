@@ -13,21 +13,22 @@ def sync_database_schema():
     - Creates missing feature tables ('profiles', 'schedules', 'medication_logs', 'notifications', 'audit_logs') with proper FKs and indexes.
     - Never drops database or deletes any data.
     """
+    import os
     import urllib.parse
-    db_url = current_app.config.get("DATABASE_URL")
-    if db_url:
-        parsed = urllib.parse.urlparse(db_url.replace("mysql+pymysql://", "mysql://"))
+    raw_db_url = current_app.config.get("DATABASE_URL") or os.getenv("MYSQL_URL") or os.getenv("MYSQL_PUBLIC_URL")
+    if raw_db_url and not raw_db_url.startswith("${{"):
+        parsed = urllib.parse.urlparse(raw_db_url.replace("mysql+pymysql://", "mysql://"))
         host = parsed.hostname or "localhost"
         port = parsed.port or 3306
         user = urllib.parse.unquote(parsed.username or "root")
         password = urllib.parse.unquote(parsed.password or "")
-        database = parsed.path.lstrip("/") or "medilens"
+        database = parsed.path.lstrip("/") or "railway"
     else:
-        host = current_app.config.get("MYSQL_HOST", "localhost")
-        port = int(current_app.config.get("MYSQL_PORT", 3306))
-        user = current_app.config.get("MYSQL_USER", "root")
-        password = current_app.config.get("MYSQL_PASSWORD", "")
-        database = current_app.config.get("MYSQL_DATABASE", "medilens")
+        host = os.getenv("MYSQLHOST") or current_app.config.get("MYSQL_HOST", "localhost")
+        port = int(os.getenv("MYSQLPORT") or current_app.config.get("MYSQL_PORT", 3306))
+        user = os.getenv("MYSQLUSER") or current_app.config.get("MYSQL_USER", "root")
+        password = os.getenv("MYSQLPASSWORD") or current_app.config.get("MYSQL_PASSWORD", "")
+        database = os.getenv("MYSQLDATABASE") or current_app.config.get("MYSQL_DATABASE", "railway")
 
     conn = pymysql.connect(
         host=host,
