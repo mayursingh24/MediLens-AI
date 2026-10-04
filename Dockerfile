@@ -33,4 +33,4 @@ ENV PORT=5000
 ENV FLASK_ENV=production
 
 # Run with Gunicorn using dynamic PORT for Railway / Render / Cloud Run
-CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 120 app:app"]
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 120 wsgi:app"]
