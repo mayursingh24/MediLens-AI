@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Processing Prescription — MediLens AI{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 3rem auto; text-align: center;">
+  <div class="card" style="padding: 3rem 2rem;">
+    <div class="spinner"></div>
+    <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem;">Analyzing Your Prescription</h2>
+    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem;">
+      Please wait while OpenCV enhances the document, Tesseract performs OCR transcription, and Gemini Vision validates medication dosages.
+    </p>
+
+    <div class="skeleton" style="height: 12px; margin-bottom: 0.75rem;"></div>
+    <div class="skeleton" style="height: 12px; width: 70%; margin: 0 auto 0.75rem;"></div>
+    <div class="skeleton" style="height: 12px; width: 50%; margin: 0 auto;"></div>
+  </div>
+</div>
+{% endblock %}

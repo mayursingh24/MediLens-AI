@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}{% if is_shopping_list %}Medicine Shopping List{% else %}My Medicines{% endif %} — MediLens AI{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto;">
+
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="font-size: 1.8rem; font-weight: 800;">
+        {% if is_shopping_list %}🛒 Medicine Shopping & Refill List{% else %}Prescribed Medicines{% endif %}
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        {% if is_shopping_list %}
+          Track required packs, quantities to purchase, and pharmacy shopping status.
+        {% else %}
+          All active medications extracted from your verified prescriptions.
+        {% endif %}
+      </p>
+    </div>
+
+    <!-- Profile Filter -->
+    <form method="GET" action="{{ url_for('medicines.shopping_list') if is_shopping_list else url_for('medicines.index') }}" style="display: flex; align-items: center; gap: 0.5rem;">
+      <label class="form-label" style="margin: 0; font-size: 0.85rem;">Profile:</label>
+      <select name="profile_id" class="form-control" style="width: auto; padding: 0.4rem 0.75rem;" onchange="this.form.submit()">
+        <option value="">All Profiles</option>
+        {% for p in profiles %}
+          <option value="{{ p.id }}" {% if active_profile_id == p.id %}selected{% endif %}>
+            {{ p.name }} ({{ p.relationship }})
+          </option>
+        {% endfor %}
+      </select>
+    </form>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+    <a href="{{ url_for('medicines.index') }}" class="btn {% if not is_shopping_list %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">
+      💊 All Medicines
+    </a>
+    <a href="{{ url_for('medicines.shopping_list') }}" class="btn {% if is_shopping_list %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">
+      🛒 Shopping List ({% if is_shopping_list %}{{ medicines|length }}{% else %}Track{% endif %})
+    </a>
+  </div>
+
+  {% if medicines %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem;">
+      {% for med in medicines %}
+        <div class="card" id="med-card-{{ med.id }}" style="display: flex; flex-direction: column; justify-content: space-between; {% if is_shopping_list and med.is_purchased %}opacity: 0.7; border-left: 4px solid var(--success);{% elif is_shopping_list %}border-left: 4px solid var(--primary);{% endif %}">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+              <h3 style="font-size: 1.15rem; font-weight: 700; {% if is_shopping_list and med.is_purchased %}text-decoration: line-through;{% endif %}">{{ med.display_name }}</h3>
+              {% if is_shopping_list %}
+                <span class="badge {% if med.is_purchased %}badge-verified{% else %}badge-review{% endif %}">
+                  {% if med.is_purchased %}✓ Purchased{% else %}Need to Buy{% endif %}
+                </span>
+              {% else %}
+                {% if med.verification_status == 'verified' %}
+                  <span class="badge badge-verified">Verified</span>
+                {% elif med.verification_status == 'unclear' %}
+                  <span class="badge badge-unclear">Unclear</span>
+                {% else %}
+                  <span class="badge badge-review">Review</span>
+                {% endif %}
+              {% endif %}
+            </div>
+
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 0.75rem;">
+              <strong>Strength:</strong> {{ med.display_strength or 'Unspecified' }} • <strong>Form:</strong> {{ med.display_form or 'Tablet' }}
+            </p>
+
+            <div style="font-size: 0.85rem; line-height: 1.6; background: var(--bg-card-subtle); padding: 0.75rem; border-radius: var(--radius-sm); margin-bottom: 1rem;">
+              <div>⏰ <strong>Frequency:</strong> {{ med.display_frequency or 'As directed' }}</div>
+              <div>🍽 <strong>Food:</strong> {{ med.display_food_instruction or 'As directed' }}</div>
+              <div>📅 <strong>Duration:</strong> {{ med.display_duration_days or 'Ongoing' }} days</div>
+              <div style="margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <strong>Quantity Needed:</strong>
+                <span>{{ med.quantity or '1 pack' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            {% if is_shopping_list %}
+              <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <button type="button" class="btn {% if med.is_purchased %}btn-secondary{% else %}btn-primary{% endif %} btn-sm" style="flex: 1;" onclick="togglePurchased({{ med.id }})">
+                  {% if med.is_purchased %}Mark as Unpurchased{% else %}✓ Mark Purchased{% endif %}
+                </button>
+              </div>
+            {% endif %}
+            <a href="{{ url_for('medicines.details', medicine_id=med.id) }}" class="btn btn-outline-primary btn-sm" style="width: 100%; text-align: center;">
+              View Pharmacology & Cost &rarr;
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card" style="text-align: center; padding: 3rem 1rem;">
+      <p style="font-size: 2rem; margin-bottom: 0.5rem;">{% if is_shopping_list %}🛒{% else %}💊{% endif %}</p>
+      <h3>{% if is_shopping_list %}Shopping list is empty{% else %}No medicines found{% endif %}</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+        {% if is_shopping_list %}
+          All prescribed medicines have either been purchased or none are marked for purchase.
+        {% else %}
+          Upload a prescription to automatically extract and catalog your medications.
+        {% endif %}
+      </p>
+      <a href="{{ url_for('prescriptions.upload') }}" class="btn btn-primary btn-sm">
+        Upload Prescription
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+async function togglePurchased(medicineId) {
+  try {
+    const res = await fetch(`/medicines/${medicineId}/toggle-purchased`, { method: "POST" });
+    const data = await res.json();
+    if (res.ok) {
+      location.reload();
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+</script>
+{% endblock %}

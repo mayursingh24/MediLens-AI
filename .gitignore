@@ -1,0 +1,49 @@
+# Security & Environment Secrets
+.env
+.env.local
+.env.*.local
+*.env
+
+# Python Bytecode & Caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# User Uploads (Preserve folders with .gitkeep)
+uploads/prescriptions/*
+!uploads/prescriptions/.gitkeep
+uploads/processed/*
+!uploads/processed/.gitkeep
+
+# Application Runtime Logs
+logs/*.log
+!logs/.gitkeep
+
+# Virtual Environments
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editor Directories
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Build & Distribution Artifacts
+dist/
+build/
+*.egg-info/
+instance/

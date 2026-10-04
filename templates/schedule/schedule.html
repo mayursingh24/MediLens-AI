@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}Personal Medication Timeline — MediLens AI{% endblock %}
+
+{% block content %}
+<div style="max-width: 1040px; margin: 0 auto; padding-bottom: 5rem;">
+
+  <!-- Header & Profile Filter -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1.25rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+        <span class="badge" style="background: rgba(0, 229, 255, 0.1); color: var(--primary); border: 1px solid rgba(0, 229, 255, 0.25); font-weight: 700; font-size: 0.75rem;">
+          ⏱ 24-HOUR MEDICATION FLOW
+        </span>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">{{ today_date }}</span>
+      </div>
+      <h1 style="font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; color: #FFFFFF; margin: 0;">
+        Personal Medication Timeline
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">
+        Structured daily doses grouped by circadian intervals with real-time adherence tracking.
+      </p>
+    </div>
+
+    <!-- Profile Filter -->
+    <form method="GET" action="{{ url_for('schedule.index') }}" style="display: flex; align-items: center; gap: 0.5rem; background: rgba(14, 20, 36, 0.7); border: 1px solid var(--border-color); padding: 0.35rem 0.75rem; border-radius: var(--radius-lg);">
+      <label class="form-label" style="margin: 0; font-size: 0.82rem; color: var(--text-muted);">Patient:</label>
+      <select name="profile_id" class="form-control" style="width: auto; padding: 0.25rem 0.6rem; font-size: 0.85rem; border: none; background: transparent; color: #FFFFFF;" onchange="this.form.submit()">
+        {% for p in profiles %}
+          <option value="{{ p.id }}" {% if active_profile_id == p.id %}selected{% endif %}>
+            {{ p.name }} ({{ p.relationship }})
+          </option>
+        {% endfor %}
+      </select>
+    </form>
+  </div>
+
+  <!-- Adherence Scorecard Card -->
+  <div class="card" style="margin-bottom: 2rem; padding: 1.75rem; background: linear-gradient(135deg, rgba(14, 20, 36, 0.9) 0%, rgba(20, 26, 48, 0.9) 100%); border-color: var(--border-color-glow); box-shadow: var(--shadow-ai-glow); border-radius: var(--radius-xl);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); margin-bottom: 0.25rem;">
+          Verified Clinical Adherence
+        </div>
+        <h3 style="font-size: 1.35rem; font-weight: 800; color: #FFFFFF; margin: 0;">7-Day Adherence Score</h3>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0.2rem 0 0 0;">
+          Calculated strictly from your confirmed medication logs.
+        </p>
+      </div>
+
+      <div style="text-align: right;">
+        <span style="font-size: 2.2rem; font-weight: 800; color: {% if adherence.adherence_percentage >= 80 %}#10B981{% elif adherence.adherence_percentage >= 50 %}#F59E0B{% else %}#EF4444{% endif %};">
+          {{ adherence.adherence_percentage }}%
+        </span>
+      </div>
+    </div>
+
+    <div class="progress-track" style="margin-top: 1.25rem; height: 8px;">
+      <div class="progress-fill" style="width: {{ adherence.adherence_percentage }}%; background: {% if adherence.adherence_percentage >= 80 %}#10B981{% elif adherence.adherence_percentage >= 50 %}#F59E0B{% else %}#EF4444{% endif %};"></div>
+    </div>
+
+    <div style="display: flex; gap: 2rem; font-size: 0.85rem; color: var(--text-muted); margin-top: 0.85rem; flex-wrap: wrap;">
+      <span>✓ Taken: <strong style="color: #34D399;">{{ adherence.taken }}</strong></span>
+      <span>✕ Skipped: <strong style="color: #F87171;">{{ adherence.skipped }}</strong></span>
+      <span>⏰ Missed: <strong style="color: #FBBF24;">{{ adherence.missed }}</strong></span>
+    </div>
+  </div>
+
+  <!-- LIVE CIRCADIAN COUNTDOWN CLOCK & AUDIO SENTINEL -->
+  <div class="card" id="nextDoseWidget" style="margin-bottom: 2rem; padding: 1.5rem 1.75rem; background: linear-gradient(135deg, rgba(14, 20, 36, 0.95) 0%, rgba(26, 32, 58, 0.95) 100%); border: 1px solid rgba(0, 229, 255, 0.25); border-radius: var(--radius-xl); box-shadow: 0 0 25px rgba(0, 229, 255, 0.08);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;">
+      
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.35); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0;">
+          ⏰
+        </div>
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="badge" style="background: rgba(0, 229, 255, 0.15); color: var(--primary); font-size: 0.72rem; font-weight: 800;">
+              LIVE CIRCADIAN TRACKER
+            </span>
+            <span id="nextSlotBadge" class="badge" style="background: rgba(255, 255, 255, 0.06); color: #94A3B8; font-size: 0.72rem;">
+              Syncing upcoming window...
+            </span>
+          </div>
+          <h3 id="nextDoseHeadline" style="font-size: 1.25rem; font-weight: 800; color: #FFFFFF; margin: 0.3rem 0 0 0;">
+            Next Scheduled Dose
+          </h3>
+          <p id="nextDoseSubtext" style="font-size: 0.84rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">
+            Real-time circadian synchronization active.
+          </p>
+        </div>
+      </div>
+
+      <!-- Real-time Countdown Timer Numbers & Sound Button -->
+      <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+        <div style="text-align: right;">
+          <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em;">
+            Time Remaining
+          </div>
+          <div id="countdownTimer" style="font-family: monospace; font-size: 1.85rem; font-weight: 800; color: var(--primary); letter-spacing: 0.04em;">
+            --:--:--
+          </div>
+        </div>
+
+        <button type="button" onclick="playMedicalChime()" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.85rem; border-color: rgba(0, 229, 255, 0.3); font-size: 0.82rem;" title="Play hospital-grade audio chime">
+          <span>🔔</span> Test Alert Chime
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Timetable Slots -->
+  {% set slots = [
+    ('morning', '🌅 Morning Interval', '08:00 AM', grouped_schedules.morning),
+    ('afternoon', '☀️ Afternoon Interval', '01:00 PM', grouped_schedules.afternoon),
+    ('evening', '🌇 Evening Interval', '06:00 PM', grouped_schedules.evening),
+    ('night', '🌙 Night Interval', '09:00 PM', grouped_schedules.night),
+    ('custom', '⏱ Custom Timings', 'Various', grouped_schedules.custom)
+  ] %}
+
+  {% for slot_key, slot_title, default_time, items in slots %}
+    {% if items %}
+      <div style="margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <h2 style="font-size: 1.25rem; font-weight: 800; color: #FFFFFF; margin: 0;">
+              {{ slot_title }}
+            </h2>
+            <span class="badge" style="background: rgba(255, 255, 255, 0.05); color: var(--primary); font-size: 0.75rem;">
+              {{ default_time }}
+            </span>
+          </div>
+          <span style="font-size: 0.82rem; color: var(--text-muted);">
+            {{ items|length }} Medicine{{ 's' if items|length > 1 else '' }}
+          </span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+          {% for s in items %}
+            <div class="dose-item {{ s.today_status }}" id="sched-card-{{ s.id }}" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.15rem 1.35rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+              
+              <div class="dose-meta">
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                  <h4 style="font-size: 1.1rem; font-weight: 800; color: #FFFFFF; margin: 0;">
+                    {{ s.medicine_name }}
+                  </h4>
+                  <span style="font-size: 0.8rem; font-weight: 600; padding: 0.2rem 0.55rem; border-radius: var(--radius-full); background: rgba(0, 229, 255, 0.1); color: var(--primary);">
+                    {{ s.dose_amount }}
+                  </span>
+                </div>
+
+                <div class="dose-subtext" style="display: flex; gap: 1.25rem; margin-top: 0.4rem; font-size: 0.84rem; color: var(--text-muted);">
+                  <span>⏰ Scheduled at <strong style="color: #E2E8F0;">{{ s.reminder_time }}</strong></span>
+                  {% if s.food_instruction %}
+                    <span>🍽 {{ s.food_instruction }}</span>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;">
+                <!-- Edit Time Form -->
+                <form method="POST" action="{{ url_for('schedule.edit_time', schedule_id=s.id) }}" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                  <input type="time" name="reminder_time" value="{{ s.reminder_time }}" class="form-control" style="width: 110px; padding: 0.3rem 0.5rem; font-size: 0.85rem;">
+                  <button type="submit" class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.65rem; font-size: 0.8rem;" title="Update reminder time">
+                    Set
+                  </button>
+                </form>
+
+                <!-- Adherence Action Buttons -->
+                <div class="dose-actions" style="display: flex; gap: 0.5rem; align-items: center;">
+                  {% if s.today_status == 'taken' %}
+                    <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 0.4rem 0.75rem; font-weight: 700;">
+                      ✓ Taken
+                    </span>
+                  {% elif s.today_status == 'skipped' %}
+                    <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 0.4rem 0.75rem;">
+                      Skipped
+                    </span>
+                  {% else %}
+                    <button type="button" class="btn btn-primary btn-sm" onclick="recordScheduleAction({{ s.id }}, 'taken')">
+                      ✓ Taken
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="recordScheduleAction({{ s.id }}, 'skipped')">
+                      Skip
+                    </button>
+                  {% endif %}
+                </div>
+              </div>
+
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+
+  {% if not (grouped_schedules.morning or grouped_schedules.afternoon or grouped_schedules.evening or grouped_schedules.night or grouped_schedules.custom) %}
+    <div class="card" style="text-align: center; padding: 4rem 1.5rem; border-radius: var(--radius-xl);">
+      <div style="font-size: 3rem; margin-bottom: 0.75rem; opacity: 0.6;">📅</div>
+      <h3 style="font-size: 1.35rem; font-weight: 800; color: #FFFFFF; margin-bottom: 0.5rem;">
+        No Active Medication Timeline
+      </h3>
+      <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 500px; margin: 0 auto 1.5rem;">
+        Upload a prescription to automatically detect your prescribed doses, timing frequencies (1-0-1, OD, BD), and meal instructions.
+      </p>
+      <a href="{{ url_for('prescriptions.upload') }}" class="btn btn-primary btn-lg" style="box-shadow: 0 0 25px var(--primary-glow);">
+        ⚡ Scan Prescription Now
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/schedule.js') }}"></script>
+{% endblock %}

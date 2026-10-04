@@ -1,0 +1,228 @@
+/**
+ * ====================================================================
+ * MEDILENS AI — DASHBOARD CLINICAL INTELLIGENCE STYLES
+ * Enterprise Apple Health x Linear Design System
+ * ====================================================================
+ */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.25rem;
+}
+
+.col-12 { grid-column: span 12; }
+.col-8 { grid-column: span 8; }
+.col-7 { grid-column: span 7; }
+.col-6 { grid-column: span 6; }
+.col-5 { grid-column: span 5; }
+.col-4 { grid-column: span 4; }
+
+@media (max-width: 992px) {
+  .col-8, .col-7, .col-6, .col-5, .col-4 {
+    grid-column: span 12;
+  }
+}
+
+/* Hero Metrics Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.profile-selector-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Stat Cards */
+.stat-card {
+  padding: 1.25rem 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(20px) saturate(180%);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-card:hover {
+  border-color: var(--border-color-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.stat-icon-primary { background: rgba(0, 229, 255, 0.1); color: var(--primary); border: 1px solid rgba(0, 229, 255, 0.2); }
+.stat-icon-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+.stat-icon-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
+.stat-icon-info { background: rgba(99, 102, 241, 0.1); color: var(--secondary); border: 1px solid rgba(99, 102, 241, 0.2); }
+
+.stat-details h4 {
+  font-family: var(--font-display);
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2rem;
+  font-weight: 600;
+}
+
+.stat-details p {
+  font-family: var(--font-mono);
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+
+/* Next Dose Banner */
+.next-dose-banner {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(99, 102, 241, 0.15) 100%);
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  color: #FFFFFF;
+  border-radius: var(--radius-xl);
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 8px 30px rgba(0, 229, 255, 0.08);
+  backdrop-filter: blur(20px);
+}
+
+.next-dose-banner h3 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin-bottom: 0.25rem;
+  color: #FFFFFF;
+}
+
+.next-dose-banner p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Medication Dose Item Card */
+.dose-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.95rem 1.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 0.65rem;
+  background: rgba(14, 19, 32, 0.6);
+  backdrop-filter: blur(16px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dose-item:hover {
+  border-color: var(--border-color-hover);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.dose-item.taken {
+  border-left: 3px solid var(--success);
+  opacity: 0.9;
+}
+
+.dose-item.skipped {
+  border-left: 3px solid var(--danger);
+  opacity: 0.75;
+}
+
+.dose-item.pending {
+  border-left: 3px solid var(--primary);
+}
+
+.dose-meta h4 {
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.dose-subtext {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  display: flex;
+  gap: 0.85rem;
+  margin-top: 0.2rem;
+}
+
+.dose-actions {
+  display: flex;
+  gap: 0.45rem;
+}
+
+/* Adherence Progress Bar */
+.adherence-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+/* Verification Alerts Box */
+.alert-item {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.15rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alert-item-content {
+  color: #FEF3C7;
+  font-size: 0.88rem;
+}
+
+/* Cost table */
+.cost-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cost-table th, .cost-table td {
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+}
+
+.cost-table th {
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cost-table td {
+  font-size: 0.88rem;
+}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}AI Health Assistant — MediLens AI{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="font-size: 1.8rem; font-weight: 800;">AI Health Assistant</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">Ask questions about your prescribed medicines, schedules, and instructions.</p>
+    </div>
+
+    <!-- Controls: Context Prescription & Language -->
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <select id="chat-prescription-select" class="form-control" style="width: auto; padding: 0.35rem 0.65rem; font-size: 0.85rem;">
+        {% for p in prescriptions %}
+          <option value="{{ p.id }}">{{ p.original_filename }} ({{ p.patient_name }})</option>
+        {% endfor %}
+      </select>
+
+      <select id="chat-language-select" class="form-control" style="width: auto; padding: 0.35rem 0.65rem; font-size: 0.85rem;">
+        <option value="en" {% if preferred_language == 'en' %}selected{% endif %}>English</option>
+        <option value="hi" {% if preferred_language == 'hi' %}selected{% endif %}>हिंदी</option>
+        <option value="hinglish" {% if preferred_language == 'hinglish' %}selected{% endif %}>Hinglish</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Chat Box Container -->
+  <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; height: 550px;">
+
+    <!-- Messages Scroll Area -->
+    <div id="chat-messages-container" style="flex: 1; overflow-y: auto; padding: 1.5rem; background: var(--bg-main);">
+      <!-- Initial Assistant Welcome Message -->
+      <div style="margin-bottom: 1rem; display: flex; justify-content: flex-start;">
+        <div style="max-width: 85%; padding: 0.85rem 1.15rem; border-radius: var(--radius-md); font-size: 0.92rem; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main);">
+          👋 Hello! I am your <strong>MediLens AI Health Assistant</strong>. I can explain your prescription, tell you when your next dose is due, or summarize doctor instructions.
+          <br><br>
+          <em>Note: I cannot diagnose conditions, recommend stopping medications, or alter dosages. For medication changes, always consult your prescriber.</em>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Question Buttons -->
+    <div style="padding: 0.6rem 1rem; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 0.5rem; overflow-x: auto; white-space: nowrap;">
+      <button type="button" class="btn btn-secondary btn-sm quick-question-btn" data-question="What medicines are prescribed?">
+        💊 What medicines are prescribed?
+      </button>
+      <button type="button" class="btn btn-secondary btn-sm quick-question-btn" data-question="When is my next medicine?">
+        ⏰ When is my next medicine?
+      </button>
+      <button type="button" class="btn btn-secondary btn-sm quick-question-btn" data-question="What is scheduled tonight?">
+        🌙 What is scheduled tonight?
+      </button>
+      <button type="button" class="btn btn-secondary btn-sm quick-question-btn" data-question="Summarize my prescription.">
+        📋 Summarize my prescription
+      </button>
+    </div>
+
+    <!-- Input Form -->
+    <form id="assistant-chat-form" style="padding: 1rem; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 0.5rem; align-items: center;">
+      <input type="text" id="chat-user-input" class="form-control" placeholder="Ask a question about your medication or timing..." autocomplete="off" required>
+
+      <button type="button" id="voice-mic-btn" class="btn btn-secondary" title="Speak question with microphone">
+        🎤 Voice
+      </button>
+
+      <button type="submit" class="btn btn-primary">
+        Send
+      </button>
+    </form>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/assistant.js') }}"></script>
+{% endblock %}

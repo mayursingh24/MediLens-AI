@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Patient & Family Profiles — MediLens AI{% endblock %}
+
+{% block content %}
+<div style="max-width: 1040px; margin: 0 auto; padding-bottom: 5rem;">
+
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+        <span class="badge" style="background: rgba(0, 229, 255, 0.1); color: var(--primary); border: 1px solid rgba(0, 229, 255, 0.25); font-weight: 700; font-size: 0.75rem;">
+          PATIENT CONTEXT PROFILES
+        </span>
+      </div>
+      <h1 style="font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; color: #FFFFFF; margin: 0;">
+        Family & Patient Profiles
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">
+        Context-aware profiles power age/weight dosing validation, cross-allergy screening, and personalized care schedules.
+      </p>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+
+    <!-- Existing Profiles List -->
+    <div class="col-7">
+      <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem; color: #FFFFFF;">
+        Active Family Profiles ({{ profiles|length }})
+      </h2>
+
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        {% for p in profiles %}
+          <div class="card" style="margin-bottom: 0; padding: 1.5rem; {% if active_profile_id == p.id %}border: 1px solid var(--primary); box-shadow: 0 0 25px var(--primary-glow);{% endif %}">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+              
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.35rem;">
+                  <h3 style="font-size: 1.25rem; font-weight: 800; color: #FFFFFF; margin: 0;">{{ p.name }}</h3>
+                  <span class="badge" style="background: rgba(255, 255, 255, 0.06); color: #CBD5E1; border: 1px solid var(--border-color);">
+                    {{ p.relationship }}
+                  </span>
+                  {% if p.is_default %}
+                    <span class="badge" style="background: rgba(0, 229, 255, 0.15); color: var(--primary); border: 1px solid rgba(0, 229, 255, 0.3);">Primary Account</span>
+                  {% endif %}
+                </div>
+
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.65rem;">
+                  <strong style="color: var(--primary);">{{ p.age_category|title }}</strong>
+                  {% if p.age %}&bull; {{ p.age }} years old{% endif %}
+                  {% if p.gender %}&bull; {{ p.gender }}{% endif %}
+                  {% if p.weight_kg %}&bull; <span style="color: #34D399; font-weight: 700;">{{ p.weight_kg }} kg</span>{% endif %}
+                </div>
+
+                <!-- Clinical Tags (Allergies & Conditions) -->
+                {% if p.allergies and p.allergies|length > 0 %}
+                  <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem; flex-wrap: wrap;">
+                    <span style="font-size: 0.75rem; color: #F87171; font-weight: 700;">Allergies:</span>
+                    {% for a in p.allergies %}
+                      <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.3); font-size: 0.72rem;">
+                        {{ a }}
+                      </span>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+
+                {% if p.existing_conditions and p.existing_conditions|length > 0 %}
+                  <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem; flex-wrap: wrap;">
+                    <span style="font-size: 0.75rem; color: #38BDF8; font-weight: 700;">Conditions:</span>
+                    {% for c in p.existing_conditions %}
+                      <span class="badge" style="background: rgba(0, 229, 255, 0.1); color: #38BDF8; border: 1px solid rgba(0, 229, 255, 0.25); font-size: 0.72rem;">
+                        {{ c }}
+                      </span>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+
+                {% if p.pregnancy_status %}
+                  <div style="font-size: 0.78rem; color: #C084FC; margin-bottom: 0.4rem;">
+                    🤰 Status: <strong>{{ p.pregnancy_status }}</strong>
+                  </div>
+                {% endif %}
+
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem;">
+                  Prescriptions On File: <strong>{{ p.prescriptions.count() }}</strong>
+                </div>
+              </div>
+
+              <!-- Switch & Actions -->
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                {% if active_profile_id != p.id %}
+                  <form method="POST" action="{{ url_for('profiles.select_profile', profile_id=p.id) }}">
+                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                      Select Profile
+                    </button>
+                  </form>
+                {% else %}
+                  <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 0.4rem 0.75rem; font-weight: 700;">
+                    ✓ Active Patient
+                  </span>
+                {% endif %}
+
+                {% if not p.is_default %}
+                  <form method="POST" action="{{ url_for('profiles.delete_profile', profile_id=p.id) }}" onsubmit="return confirm('Delete this family member profile and associated records?');">
+                    <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--danger); padding: 0.4rem 0.65rem;" title="Delete Profile">
+                      🗑
+                    </button>
+                  </form>
+                {% endif %}
+              </div>
+
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Create New Profile Form -->
+    <div class="col-5">
+      <div class="card" style="padding: 1.75rem; background: var(--bg-card); border-radius: var(--radius-xl);">
+        <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem; color: #FFFFFF;">
+          Add Family Member
+        </h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          Include clinical details to enable age-appropriate warnings and pediatric weight safety.
+        </p>
+
+        <form method="POST" action="{{ url_for('profiles.create_profile') }}">
+          <div class="form-group">
+            <label class="form-label" for="profile_name">Full Name *</label>
+            <input type="text" id="profile_name" name="name" class="form-control" placeholder="e.g. Ramesh Kumar" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="relationship">Relationship *</label>
+            <select id="relationship" name="relationship" class="form-control" required>
+              <option value="Me">Me</option>
+              <option value="Father">Father</option>
+              <option value="Mother">Mother</option>
+              <option value="Grandparent">Grandparent (Older Adult)</option>
+              <option value="Child">Child (Pediatric)</option>
+              <option value="Spouse">Spouse</option>
+              <option value="Custom">Custom / Other</option>
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="age">Age (Years)</label>
+              <input type="number" id="age" name="age" class="form-control" placeholder="e.g. 8 or 68">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="gender">Gender</label>
+              <select id="gender" name="gender" class="form-control">
+                <option value="">Select...</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Weight Input (Vital for pediatric calculations) -->
+          <div class="form-group">
+            <label class="form-label" for="weight_kg">Weight (kg) <span style="font-size: 0.75rem; color: var(--primary);">(Critical for Pediatric)</span></label>
+            <input type="number" step="0.1" id="weight_kg" name="weight_kg" class="form-control" placeholder="e.g. 24.5">
+          </div>
+
+          <!-- Allergies (Comma separated) -->
+          <div class="form-group">
+            <label class="form-label" for="allergies">Known Drug Allergies</label>
+            <input type="text" id="allergies" name="allergies" class="form-control" placeholder="e.g. Penicillin, Sulfa, Aspirin">
+            <small style="color: var(--text-muted); font-size: 0.72rem;">Separate multiple items with commas</small>
+          </div>
+
+          <!-- Existing Medical Conditions -->
+          <div class="form-group">
+            <label class="form-label" for="conditions">Existing Medical Conditions</label>
+            <input type="text" id="conditions" name="conditions" class="form-control" placeholder="e.g. Diabetes, Hypertension, Asthma">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="pregnancy_status">Pregnancy / Nursing Status</label>
+            <select id="pregnancy_status" name="pregnancy_status" class="form-control">
+              <option value="">Not Applicable / None</option>
+              <option value="Pregnant - 1st Trimester">Pregnant (1st Trimester)</option>
+              <option value="Pregnant - 2nd/3rd Trimester">Pregnant (2nd / 3rd Trimester)</option>
+              <option value="Breastfeeding / Nursing">Breastfeeding / Nursing</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="notes">General Care Notes</label>
+            <textarea id="notes" name="notes" class="form-control" rows="2" placeholder="e.g. Takes calcium supplements daily morning"></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem; font-weight: 700;">
+            + Save Patient Profile
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

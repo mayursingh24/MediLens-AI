@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+
+{% block title %}{{ medicine.display_name }} — Clinical Details & Cost{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <h1 style="font-size: 2rem; font-weight: 800;">{{ medicine.display_name }}</h1>
+        {% if medicine.verification_status == 'verified' %}
+          <span class="badge badge-verified">Verified</span>
+        {% else %}
+          <span class="badge badge-review">{{ medicine.verification_status|capitalize }}</span>
+        {% endif %}
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">Prescription instruction audit and general pharmacology profile</p>
+    </div>
+
+    <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <button type="button" class="btn btn-outline-primary btn-sm" onclick="speakMedicineInfo()" style="display: inline-flex; align-items: center; gap: 0.35rem; border-color: rgba(0, 229, 255, 0.4);">
+        <span>🎧</span> Listen
+      </button>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="shareMedicineWhatsApp()" style="background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); display: inline-flex; align-items: center; gap: 0.35rem;">
+        <span>📲</span> WhatsApp
+      </button>
+      <a href="{{ url_for('medicines.index') }}" class="btn btn-secondary btn-sm">
+        &larr; Back to Medicines
+      </a>
+    </div>
+  </div>
+
+  <!-- SECTION 1: FROM YOUR PRESCRIPTION (Mandatory Separation) -->
+  <div class="card" style="border-left: 4px solid var(--primary); margin-bottom: 1.5rem;">
+    <div class="card-header">
+      <h2 class="card-title" style="color: var(--primary);">📋 FROM YOUR PRESCRIPTION</h2>
+      <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase;">Doctor's Direct Order</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem;">
+      <div class="summary-item">
+        <span class="summary-label">Strength</span>
+        <div class="summary-value">{{ medicine.display_strength or 'Not explicitly specified' }}</div>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Prescribed Form</span>
+        <div class="summary-value">{{ medicine.display_form or 'Tablet' }}</div>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Frequency / Pattern</span>
+        <div class="summary-value">{{ medicine.display_frequency or 'As directed' }}</div>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Meal Instruction</span>
+        <div class="summary-value">{{ medicine.display_food_instruction or 'As directed by physician' }}</div>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Course Duration</span>
+        <div class="summary-value">{{ medicine.display_duration_days or 'Ongoing' }} days</div>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Prescribing Doctor</span>
+        <div class="summary-value">Dr. {{ medicine.prescription.doctor_name or 'Doctor' }}</div>
+      </div>
+    </div>
+
+    {% if medicine.special_instruction %}
+      <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); font-size: 0.9rem;">
+        <strong>Special Doctor Instructions:</strong> {{ medicine.special_instruction }}
+      </div>
+    {% endif %}
+
+    <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted); background: var(--bg-card-subtle); padding: 0.5rem 0.75rem; border-radius: var(--radius-sm);">
+      Prescription Source: <em>{{ medicine.prescription.original_filename }}</em> (Page {{ medicine.source_page }})
+    </div>
+  </div>
+
+  <!-- SECTION 2: COST ESTIMATION (Indian E-Pharmacies & PMBJP Jan Aushadhi) -->
+  <div class="card" style="border-left: 4px solid var(--secondary); margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(14, 20, 36, 0.95) 0%, rgba(16, 26, 42, 0.95) 100%);">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+      <h2 class="card-title" style="color: var(--secondary); font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+        <span>💰</span> COST INTELLIGENCE & SAVINGS
+      </h2>
+      <span class="badge" style="background: rgba(0, 229, 255, 0.12); color: var(--primary); border: 1px solid rgba(0, 229, 255, 0.3); font-size: 0.72rem;">
+        ⚡ Live E-Pharmacy Index
+      </span>
+    </div>
+
+    {% if pricing_info.status == 'verified' %}
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 0.25rem;">
+            Market Retail Price (Brand Range)
+          </div>
+          <div style="font-size: 1.75rem; font-weight: 800; color: #FFFFFF; letter-spacing: -0.02em;">
+            {{ pricing_info.price }}
+          </div>
+          {% if pricing_info.brand_mrp or pricing_info.online_discount_price %}
+            <div style="font-size: 0.85rem; color: #94A3B8; margin-top: 0.25rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+              {% if pricing_info.brand_mrp %}
+                <span>Standard MRP: <strong style="color: #E2E8F0;">{{ pricing_info.brand_mrp }}</strong></span>
+              {% endif %}
+              {% if pricing_info.online_discount_price %}
+                <span>Online Rate: <strong style="color: #38BDF8;">{{ pricing_info.online_discount_price }}</strong></span>
+              {% endif %}
+            </div>
+          {% endif %}
+          <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.4rem;">
+            Source: <strong>{{ pricing_info.source }}</strong> &bull; Verified: <strong>{{ pricing_info.last_updated }}</strong>
+          </p>
+        </div>
+        <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.4rem 0.75rem; font-size: 0.8rem;">
+          ✓ Verified Market Pricing
+        </span>
+      </div>
+
+      {% if pricing_info.generic_alternative %}
+        <!-- PMBJP Generic Alternative & Savings Banner -->
+        <div style="padding: 1rem; background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 800; color: #34D399; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.4rem;">
+              <span>🇮🇳</span> Pradhan Mantri Jan Aushadhi (Generic Equivalent)
+            </div>
+            <div style="font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin-top: 0.25rem;">
+              {{ pricing_info.generic_alternative }}
+              {% if pricing_info.generic_price %}
+                &bull; <span style="color: #34D399; font-weight: 800;">{{ pricing_info.generic_price }}</span>
+              {% endif %}
+            </div>
+            <div style="font-size: 0.78rem; color: #94A3B8; margin-top: 0.2rem;">
+              Same active pharmaceutical ingredient at government-subsidized Kendra pricing.
+            </div>
+          </div>
+
+          {% if pricing_info.savings_percentage %}
+            <div style="text-align: right;">
+              <span class="badge" style="background: #10B981; color: #042F2C; font-weight: 800; padding: 0.4rem 0.85rem; font-size: 0.88rem; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);">
+                Save ~{{ pricing_info.savings_percentage }}%
+              </span>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+    {% else %}
+      <div style="padding: 0.5rem 0;">
+        <p style="font-size: 1.05rem; font-weight: 600; color: var(--text-muted);">
+          Current price could not be verified.
+        </p>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+          In accordance with MediLens AI safety standards, drug prices are never fabricated. Check directly with your local chemist or Jan Aushadhi Kendra.
+        </p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- SECTION 3: GENERAL MEDICINE INFORMATION (OpenFDA, IP & CDSCO Verified) -->
+  <div class="card" style="border-left: 4px solid #8B5CF6; margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(14, 20, 36, 0.95) 0%, rgba(16, 26, 42, 0.95) 100%);">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+      <h2 class="card-title" style="color: #C084FC; font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+        <span>📖</span> CLINICAL DRUG MONOGRAPH
+      </h2>
+      <span class="badge" style="background: rgba(192, 132, 252, 0.12); color: #C084FC; border: 1px solid rgba(192, 132, 252, 0.3); font-size: 0.72rem;">
+        Official Clinical Database
+      </span>
+    </div>
+
+    {% if general_info.status == 'success' %}
+      <div style="display: flex; flex-direction: column; gap: 1.1rem; font-size: 0.92rem; line-height: 1.6;">
+        
+        <div>
+          <strong style="color: #A5B4FC; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.25rem;">
+            Active Substance / Generic Molecule:
+          </strong>
+          <div style="font-size: 1.15rem; font-weight: 800; color: #FFFFFF;">
+            {{ general_info.generic_name or (general_info.data.generic_name if general_info.data else medicine.display_name) }}
+          </div>
+        </div>
+
+        <div>
+          <strong style="color: #A5B4FC; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.25rem;">
+            General Purpose & Clinical Indications:
+          </strong>
+          <p style="color: #E2E8F0; margin: 0;">
+            {{ general_info.indications or (general_info.data.indications if general_info.data else 'Standard therapeutic indications.') }}
+          </p>
+        </div>
+
+        {% if general_info.administration or (general_info.data and general_info.data.administration) %}
+          <div>
+            <strong style="color: #A5B4FC; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.25rem;">
+              Administration Guidelines:
+            </strong>
+            <p style="color: #CBD5E1; margin: 0;">
+              {{ general_info.administration or general_info.data.administration }}
+            </p>
+          </div>
+        {% endif %}
+
+        {% if general_info.warnings or (general_info.data and general_info.data.warnings) %}
+          <div style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: var(--radius-sm); padding: 0.85rem;">
+            <strong style="color: #F87171; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.25rem;">
+              ⚠️ Warnings & Clinical Precautions:
+            </strong>
+            <p style="color: #FECACA; margin: 0; font-size: 0.88rem;">
+              {{ general_info.warnings or general_info.data.warnings }}
+            </p>
+          </div>
+        {% endif %}
+
+        {% if general_info.storage or (general_info.data and general_info.data.storage) %}
+          <div>
+            <strong style="color: #A5B4FC; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.25rem;">
+              Storage & Handling:
+            </strong>
+            <p style="color: #CBD5E1; margin: 0;">
+              {{ general_info.storage or general_info.data.storage }}
+            </p>
+          </div>
+        {% endif %}
+
+        <!-- Verified Source Attribution -->
+        <div style="padding-top: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            {% if general_info.sources and general_info.sources|length > 0 %}
+              <span>Verified Reference: </span>
+              <a href="{{ general_info.sources[0].source_url }}" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: underline;">
+                {{ general_info.sources[0].source_name }}
+              </a>
+              <span> &bull; {{ general_info.sources[0].retrieved_at }}</span>
+            {% else %}
+              <span>Verified via OpenFDA & Indian Pharmacopoeia Registries</span>
+            {% endif %}
+          </div>
+          <span style="color: #10B981; font-weight: 700;">✓ Formally Audited</span>
+        </div>
+
+        <div style="margin-top: 0.25rem; padding: 0.65rem 0.85rem; background: rgba(245, 158, 11, 0.08); border-left: 3px solid #F59E0B; color: #FDE68A; border-radius: 4px; font-size: 0.78rem;">
+          <strong>DISCLAIMER:</strong> {{ general_info.disclaimer or 'Derived from official clinical pharmacopoeia labeling. Does not substitute clinician direct advice.' }}
+        </div>
+      </div>
+    {% else %}
+      <p style="color: var(--text-muted); font-size: 0.9rem;">
+        {{ general_info.message or 'General drug reference information is currently unavailable for this item.' }}
+      </p>
+    {% endif %}
+  </div>
+
+  <!-- SECTION 4: FOOD & DIETARY PRECAUTIONS (Dual-AI Engine) -->
+  {% set diet = medicine.dietary_guidelines %}
+  {% if diet %}
+    <div class="card" style="border-left: 4px solid #10B981; margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(14, 20, 36, 0.95) 0%, rgba(16, 26, 42, 0.95) 100%);">
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+        <h2 class="card-title" style="color: #34D399; font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+          <span>🥗</span> FOOD & DIETARY PRECAUTIONS <span style="font-size: 0.85rem; font-weight: 600; color: var(--primary);">(क्या खाएं और क्या न खाएं)</span>
+        </h2>
+        <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.72rem;">
+          ⚡ Groq 120B Verified
+        </span>
+      </div>
+
+      {% if diet.hindi_summary %}
+        <div style="background: rgba(0, 229, 255, 0.05); border-left: 3px solid var(--primary); border-radius: 4px; padding: 0.75rem 1rem; font-size: 0.9rem; color: #E2E8F0; margin-bottom: 1.25rem; line-height: 1.6;">
+          <strong>💡 मुख्य सलाह:</strong> {{ diet.hindi_summary }}
+        </div>
+      {% endif %}
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+        <!-- Foods to Eat -->
+        <div style="background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: var(--radius-md); padding: 1rem;">
+          <div style="font-size: 0.78rem; font-weight: 800; text-transform: uppercase; color: #34D399; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.35rem;">
+            <span>🟢</span> Recommended Foods to Eat (क्या खाएं)
+          </div>
+          <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem; color: #E2E8F0; line-height: 1.6;">
+            {% for item in diet.foods_to_eat %}
+              <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Foods to Avoid -->
+        <div style="background: rgba(239, 68, 68, 0.04); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: var(--radius-md); padding: 1rem;">
+          <div style="font-size: 0.78rem; font-weight: 800; text-transform: uppercase; color: #F87171; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.35rem;">
+            <span>🔴</span> Strictly Avoid / Caution (क्या न खाएं)
+          </div>
+          <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem; color: #FECACA; line-height: 1.6;">
+            {% for item in diet.foods_to_avoid %}
+              <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.82rem; color: var(--text-muted); border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 0.85rem;">
+        {% if diet.timing_guidance %}
+          <div style="flex: 1; min-width: 240px;">
+            <strong style="color: #93C5FD;">⏰ Timing:</strong> {{ diet.timing_guidance }}
+          </div>
+        {% endif %}
+        {% if diet.substances_warning %}
+          <div style="flex: 1; min-width: 240px;">
+            <strong style="color: #FCA5A5;">⚠️ Alcohol / Tobacco:</strong> {{ diet.substances_warning }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+  <div style="text-align: center; margin-top: 1.5rem;">
+    <a href="{{ url_for('assistant.chat') }}" class="btn btn-outline-primary btn-sm">
+      💬 Ask MediLens Assistant About This Medicine &rarr;
+    </a>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function speakMedicineInfo() {
+    if (!window.speechSynthesis) return alert('Speech synthesis not supported on this browser.');
+    window.speechSynthesis.cancel();
+    const text = "{{ medicine.display_name }}. Prescribed frequency: {{ medicine.display_frequency }}. Meal timing: {{ medicine.display_food_instruction }}. Clinical purpose: {{ (general_info.why_taking_this or general_info.indications or '')|replace('\"', '')|truncate(180) }}";
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.rate = 0.95;
+    window.speechSynthesis.speak(utt);
+  }
+
+  function shareMedicineWhatsApp() {
+    let msg = `🏥 *MediLens AI — Medicine Profile*\n\n`;
+    msg += `💊 *{{ medicine.display_name }}* ({{ medicine.display_strength or 'standard' }})\n`;
+    msg += `📋 *Dose:* {{ medicine.display_frequency }} | 🍽 {{ medicine.display_food_instruction }} | ⏱ {{ medicine.display_duration_days }} Days\n\n`;
+    {% if pricing_info.status == 'verified' %}
+    msg += `💰 *Market Price:* {{ pricing_info.price }}\n`;
+    {% if pricing_info.generic_alternative %}
+    msg += `🇮🇳 *Jan Aushadhi Alternative:* {{ pricing_info.generic_alternative }} (Save ~{{ pricing_info.savings_percentage }}%)\n\n`;
+    {% endif %}
+    {% endif %}
+    msg += `⚡ Verified by MediLens AI`;
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+  }
+</script>
+{% endblock %}

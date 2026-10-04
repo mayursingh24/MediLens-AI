@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Care Dashboard — MediLens AI{% endblock %}
+
+{% block content %}
+<div style="max-width: 1140px; margin: 0 auto; padding-bottom: 4rem;">
+
+  <!-- Patient Header & Profile Switcher -->
+  <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1.25rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+        <span class="badge" style="background: rgba(0, 229, 255, 0.1); color: var(--primary); border: 1px solid rgba(0, 229, 255, 0.25); font-weight: 700; font-size: 0.75rem;">
+          ● ACTIVE CARE PLAN
+        </span>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">{{ today_formatted }}</span>
+      </div>
+      <h1 style="font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; color: #FFFFFF; margin: 0;">
+        Hello, {{ active_profile.name if active_profile else (current_user.full_name or 'Patient') }}
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">
+        {% if active_profile %}
+          Tracking treatment plan for <strong>{{ active_profile.name }}</strong> ({{ active_profile.relationship }}) &bull; {{ active_profile.age_category|title }} {% if active_profile.age %}({{ active_profile.age }} yrs){% endif %}
+        {% else %}
+          Here is your personalized daily medication intelligence and schedule.
+        {% endif %}
+      </p>
+    </div>
+
+    <!-- Actions & Profile Switcher -->
+    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+      {% if profiles and profiles|length > 1 %}
+        <div style="display: flex; align-items: center; gap: 0.5rem; background: rgba(14, 20, 36, 0.7); border: 1px solid var(--border-color); padding: 0.35rem 0.75rem; border-radius: var(--radius-lg);">
+          <span style="font-size: 0.82rem; color: var(--text-muted);">Profile:</span>
+          <select class="form-control" style="width: auto; padding: 0.25rem 0.6rem; font-size: 0.85rem; border: none; background: transparent; color: #FFFFFF;" onchange="window.location.href='/profiles/' + this.value + '/select'">
+            {% for p in profiles %}
+              <option value="{{ p.id }}" {% if active_profile and p.id == active_profile.id %}selected{% endif %}>
+                {{ p.name }} ({{ p.relationship }})
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      {% endif %}
+
+      <a href="{{ url_for('prescriptions.upload') }}" class="btn btn-primary btn-sm" style="box-shadow: 0 0 20px var(--primary-glow); font-weight: 700; padding: 0.55rem 1.15rem;">
+        ⚡ Scan Prescription
+      </a>
+      <a href="{{ url_for('pharmacy.index') }}" class="btn btn-secondary btn-sm" style="padding: 0.55rem 1rem;">
+        📍 Nearby Pharmacies
+      </a>
+    </div>
+  </div>
+
+  <!-- Clinical Alerts (Unclear Handwriting / Verification Required) -->
+  {% if pending_verifications and pending_verifications|length > 0 %}
+    <div style="background: rgba(245, 158, 11, 0.08); border-left: 4px solid #F59E0B; border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 0.85rem;">
+        <span style="font-size: 1.5rem;">⚠️</span>
+        <div>
+          <div style="font-size: 0.98rem; font-weight: 700; color: #FFFFFF;">
+            Handwriting Verification Required ({{ pending_verifications|length }} Item{{ 's' if pending_verifications|length > 1 else '' }})
+          </div>
+          <div style="font-size: 0.88rem; color: #D1D5DB; margin-top: 0.15rem;">
+            Prescribed handwriting could not be verified with 100% certainty. Confirm names and dosages with your prescriber.
+          </div>
+        </div>
+      </div>
+      <a href="{{ url_for('prescriptions.history') }}" class="btn btn-secondary btn-sm" style="background: rgba(245, 158, 11, 0.2); color: #F59E0B; border-color: rgba(245, 158, 11, 0.4);">
+        Review Flags &rarr;
+      </a>
+    </div>
+  {% endif %}
+
+  <!-- KPI Overview Cards -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+    
+    <!-- Next Upcoming Dose Card -->
+    <div class="card" style="padding: 1.5rem; background: linear-gradient(135deg, rgba(0, 229, 255, 0.08) 0%, rgba(14, 20, 36, 0.8) 100%); border-color: rgba(0, 229, 255, 0.25); position: relative; overflow: hidden;">
+      <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.06em; color: var(--primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
+        <span>⏰</span> Next Scheduled Dose
+      </div>
+      {% if next_medicine %}
+        <div style="font-size: 1.3rem; font-weight: 800; color: #FFFFFF; margin-bottom: 0.25rem;">
+          {{ next_medicine.medicine_name }}
+        </div>
+        <div style="font-size: 0.88rem; color: #CBD5E1; margin-bottom: 1rem;">
+          {{ next_medicine.dose_amount }} &bull; <strong>{{ next_medicine.reminder_time }}</strong> ({{ next_medicine.time_slot|capitalize }})
+          {% if next_medicine.food_instruction %}<br><span style="font-size: 0.8rem; color: var(--text-muted);">🍽 {{ next_medicine.food_instruction }}</span>{% endif %}
+        </div>
+        <button type="button" class="btn btn-primary btn-sm" style="width: 100%; font-weight: 700;" onclick="logMedicationDose({{ next_medicine.id }}, 'taken')">
+          ✓ Mark as Taken
+        </button>
+      {% else %}
+        <div style="font-size: 1.1rem; font-weight: 700; color: #FFFFFF; margin-bottom: 0.25rem;">
+          All Doses Completed
+        </div>
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+          No remaining doses scheduled for today. Great job!
+        </div>
+        <a href="{{ url_for('schedule.index') }}" class="btn btn-secondary btn-sm" style="width: 100%;">
+          View Timeline
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- Active Medicines Count -->
+    <div class="card" style="padding: 1.5rem;">
+      <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
+        <span>💊</span> Active Medications
+      </div>
+      <div style="font-size: 2.2rem; font-weight: 800; color: #FFFFFF; line-height: 1.1; margin-bottom: 0.35rem;">
+        {{ today_medicines|length }}
+      </div>
+      <div style="font-size: 0.85rem; color: var(--text-muted);">
+        Daily doses across 4 time slots
+      </div>
+      <div style="margin-top: 1rem;">
+        <a href="{{ url_for('medicines.index') }}" style="font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600;">
+          Manage Medications &rarr;
+        </a>
+      </div>
+    </div>
+
+    <!-- 7-Day Adherence Metric -->
+    <div class="card" style="padding: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.06em; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem;">
+          <span>📈</span> 7-Day Adherence
+        </div>
+        <span style="font-size: 1.3rem; font-weight: 800; color: {% if adherence.adherence_percentage >= 80 %}#10B981{% elif adherence.adherence_percentage >= 50 %}#F59E0B{% else %}#EF4444{% endif %};">
+          {{ adherence.adherence_percentage }}%
+        </span>
+      </div>
+      
+      <div class="progress-track" style="margin-bottom: 0.75rem;">
+        <div class="progress-fill" style="width: {{ adherence.adherence_percentage }}%; background: {% if adherence.adherence_percentage >= 80 %}#10B981{% elif adherence.adherence_percentage >= 50 %}#F59E0B{% else %}#EF4444{% endif %};"></div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted);">
+        <span>Taken: <strong style="color: #FFFFFF;">{{ adherence.taken }}</strong></span>
+        <span>Skipped: <strong style="color: #FFFFFF;">{{ adherence.skipped }}</strong></span>
+        <span>Missed: <strong style="color: #FFFFFF;">{{ adherence.missed }}</strong></span>
+      </div>
+      
+      <div style="margin-top: 0.85rem;">
+        <a href="{{ url_for('schedule.index') }}" style="font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600;">
+          Full Schedule &rarr;
+        </a>
+      </div>
+    </div>
+
+    <!-- Active Prescription Info -->
+    <div class="card" style="padding: 1.5rem;">
+      <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
+        <span>📋</span> Current Prescription
+      </div>
+      {% if latest_prescription %}
+        <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          {{ latest_prescription.doctor_name or 'Dr. (Not Listed)' }}
+        </div>
+        <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+          {{ latest_prescription.prescription_date or latest_prescription.created_at.strftime('%d %b %Y') }} &bull; {{ latest_prescription.medicines.count() }} Meds
+        </div>
+        <a href="{{ url_for('prescriptions.result', prescription_id=latest_prescription.id) }}" class="btn btn-outline-primary btn-sm" style="width: 100%; font-size: 0.82rem;">
+          View AI Care Plan &rarr;
+        </a>
+      {% else %}
+        <div style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+          No prescriptions uploaded yet.
+        </div>
+        <a href="{{ url_for('prescriptions.upload') }}" class="btn btn-primary btn-sm" style="width: 100%;">
+          Upload First Prescription
+        </a>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- Main Dashboard Content Grid -->
+  <div class="dashboard-grid">
+    
+    <!-- Left Column: Today's Medication Flow -->
+    <div class="col-8">
+      
+      <div class="card" style="padding: 1.75rem;">
+        <div class="card-header" style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.25rem;">
+          <div>
+            <h3 class="card-title" style="font-size: 1.25rem; font-weight: 800; color: #FFFFFF;">
+              Today's Medication Flow
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">
+              Mark your medicines as taken or skipped to maintain adherence records.
+            </p>
+          </div>
+          <span class="badge" style="background: rgba(255, 255, 255, 0.05); color: #CBD5E1; border: 1px solid var(--border-color);">
+            {{ today_medicines|length }} Dose(s)
+          </span>
+        </div>
+
+        {% if today_medicines %}
+          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            {% for dose in today_medicines %}
+              <div class="dose-item {{ dose.today_status }}" id="dose-item-{{ dose.id }}" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                
+                <div class="dose-meta">
+                  <div style="display: flex; align-items: center; gap: 0.65rem;">
+                    <h4 style="font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin: 0;">
+                      {{ dose.medicine_name }}
+                    </h4>
+                    <span style="font-size: 0.8rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: var(--radius-full); background: rgba(0, 229, 255, 0.1); color: var(--primary);">
+                      {{ dose.dose_amount }}
+                    </span>
+                  </div>
+                  
+                  <div class="dose-subtext" style="display: flex; gap: 1rem; margin-top: 0.4rem; font-size: 0.82rem; color: var(--text-muted);">
+                    <span>⏰ <strong>{{ dose.reminder_time }}</strong> ({{ dose.time_slot|capitalize }})</span>
+                    {% if dose.food_instruction %}
+                      <span>🍽 {{ dose.food_instruction }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="dose-actions" style="display: flex; gap: 0.5rem; align-items: center;">
+                  {% if dose.today_status == 'taken' %}
+                    <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 0.4rem 0.75rem; font-weight: 700;">
+                      ✓ Taken
+                    </span>
+                  {% elif dose.today_status == 'skipped' %}
+                    <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 0.4rem 0.75rem;">
+                      Skipped
+                    </span>
+                  {% else %}
+                    <button type="button" class="btn btn-primary btn-sm" onclick="logMedicationDose({{ dose.id }}, 'taken')">
+                      ✓ Taken
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="logMedicationDose({{ dose.id }}, 'skipped')">
+                      Skip
+                    </button>
+                  {% endif %}
+                </div>
+
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+            <div style="font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.7;">💊</div>
+            <h4 style="color: #FFFFFF; font-weight: 700; margin-bottom: 0.35rem;">No Medications Scheduled For Today</h4>
+            <p style="font-size: 0.9rem; max-width: 440px; margin: 0 auto 1.25rem;">
+              Upload or scan a doctor's prescription to automatically generate your medication timeline and dose reminders.
+            </p>
+            <a href="{{ url_for('prescriptions.upload') }}" class="btn btn-primary btn-sm">
+              Scan Prescription
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Treatment Timeline / Current Course -->
+      {% if latest_prescription %}
+        <div class="card" style="padding: 1.5rem; margin-top: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: #FFFFFF; margin: 0;">Active Treatment Course</h3>
+            <a href="{{ url_for('prescriptions.result', prescription_id=latest_prescription.id) }}" style="font-size: 0.85rem; color: var(--primary);">
+              View Prescription Diff & Map &rarr;
+            </a>
+          </div>
+          <div style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+            Prescribed by <strong>{{ latest_prescription.doctor_name or 'Prescriber' }}</strong> for <strong>{{ latest_prescription.patient_name }}</strong>.
+          </div>
+          <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+            {% for med in latest_prescription.medicines %}
+              <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.5rem 0.85rem; font-size: 0.85rem;">
+                <strong style="color: #FFFFFF;">{{ med.display_name }}</strong>
+                {% if med.display_strength %}<span style="color: var(--text-muted);">({{ med.display_strength }})</span>{% endif %}
+                <span style="color: var(--primary); font-size: 0.75rem; margin-left: 0.35rem;">{{ med.display_frequency or '1-0-1' }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+    </div>
+
+    <!-- Right Column: Quick Intelligence & Fast Actions -->
+    <div class="col-4" style="display: flex; flex-direction: column; gap: 1.5rem;">
+      
+      <!-- Ask MediLens AI Card -->
+      <div class="card" style="padding: 1.5rem; background: linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(14, 20, 36, 0.9) 100%); border-color: rgba(168, 85, 247, 0.3);">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <span style="font-size: 1.25rem;">✨</span>
+          <h3 style="font-size: 1.05rem; font-weight: 800; color: #FFFFFF; margin: 0;">Ask MediLens AI</h3>
+        </div>
+        <p style="font-size: 0.85rem; color: #E2E8F0; line-height: 1.5; margin-bottom: 1rem;">
+          Have questions about your medicines, food precautions, or when to take your next dose? Ask in English, Hindi, or Hinglish.
+        </p>
+        <button type="button" class="btn btn-outline-primary btn-sm" style="width: 100%;" onclick="document.getElementById('global-ai-trigger').click()">
+          Open AI Assistant &rarr;
+        </button>
+      </div>
+
+      <!-- Nearby Pharmacies Finder -->
+      <div class="card" style="padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <span style="font-size: 1.25rem;">📍</span>
+          <h3 style="font-size: 1.05rem; font-weight: 800; color: #FFFFFF; margin: 0;">Nearby Pharmacies</h3>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+          Locate verified pharmacies near your current GPS or city with directions and phone numbers.
+        </p>
+        <a href="{{ url_for('pharmacy.index') }}" class="btn btn-secondary btn-sm" style="width: 100%;">
+          Locate Pharmacies Near Me ↗
+        </a>
+      </div>
+
+      <!-- Browser Reminders Switcher -->
+      <div class="card" style="padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <span style="font-size: 1.25rem;">🔔</span>
+          <h3 style="font-size: 1.05rem; font-weight: 800; color: #FFFFFF; margin: 0;">Dose Reminders</h3>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+          Receive browser alerts for scheduled medicine timings so you never miss a dose.
+        </p>
+        <button id="enable-browser-notifications-btn" class="btn btn-outline-primary btn-sm" style="width: 100%;">
+          Enable Browser Reminders
+        </button>
+      </div>
+
+      <!-- Estimated Generic Cost Overview -->
+      {% if unique_costs %}
+        <div class="card" style="padding: 1.5rem;">
+          <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 0.5rem;">
+            Affordable Generic Overview
+          </div>
+          <table class="cost-table" style="font-size: 0.82rem;">
+            <tbody>
+              {% for item in unique_costs %}
+                <tr>
+                  <td style="padding: 0.4rem 0;"><strong>{{ item.medicine_name }}</strong></td>
+                  <td style="text-align: right; padding: 0.4rem 0; color: #34D399; font-weight: 700;">
+                    {{ item.price }}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endif %}
+
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

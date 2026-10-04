@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Scan Prescription — MediLens AI Intelligence{% endblock %}
+
+{% block content %}
+<div style="max-width: 760px; margin: 1.5rem auto;">
+  <div style="text-align: center; margin-bottom: 2.5rem;">
+    <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.25); padding: 0.3rem 0.8rem; border-radius: var(--radius-full); margin-bottom: 1rem;">
+      <span class="ai-pulse-dot" style="background: var(--primary);"></span>
+      <span style="color: var(--primary); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;">
+        Multimodal Clinical Scanner
+      </span>
+    </div>
+    <h1 style="font-size: 2.4rem; font-weight: 900; letter-spacing: -0.02em; color: #FFFFFF; margin-bottom: 0.5rem;">
+      Analyze Prescription
+    </h1>
+    <p style="color: var(--text-secondary); font-size: 1.05rem; max-width: 580px; margin: 0 auto;">
+      Upload an image or PDF of your doctor's prescription. Our AI vision and clinical intelligence pipeline will transcribe, verify, and explain every medication.
+    </p>
+  </div>
+
+  <!-- Main Upload Card -->
+  <div class="card" id="upload-card-wrapper" style="padding: 2.25rem;">
+    <form method="POST" action="{{ url_for('prescriptions.upload') }}" enctype="multipart/form-data" id="prescription-upload-form">
+      <!-- Profile Selection -->
+      <div class="form-group" style="margin-bottom: 1.75rem;">
+        <label class="form-label" for="profile_id">
+          Patient Profile (Age & Context):
+        </label>
+        <select name="profile_id" id="profile_id" class="form-control" style="font-size: 0.95rem;">
+          {% for p in profiles %}
+            <option value="{{ p.id }}" {% if active_profile_id and p.id == active_profile_id %}selected{% endif %}>
+              {{ p.name }} ({{ p.relationship }}{% if p.age %}, {{ p.age }} yrs{% endif %}{% if p.weight_kg %}, {{ p.weight_kg }} kg{% endif %})
+            </option>
+          {% endfor %}
+        </select>
+        <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem;">
+          💡 Patient age and weight ensure accurate pediatric or geriatric dosage safety checks.
+        </div>
+      </div>
+
+      <!-- File Dropzone -->
+      <div class="dropzone-container" id="prescription-dropzone">
+        <div class="dropzone-icon">📄</div>
+        <div class="dropzone-text">
+          <h3>Drag & Drop prescription file</h3>
+          <p>Supports JPG, JPEG, PNG, WEBP, and multi-page PDF (Max 16 MB)</p>
+        </div>
+
+        <input type="file" name="prescription_file" id="prescription-file-input" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf" style="display: none;">
+
+        <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+          <button type="button" class="btn btn-secondary btn-sm" id="browse-btn">
+            📂 Choose File
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" id="camera-trigger-btn">
+            📷 Camera Capture
+          </button>
+        </div>
+      </div>
+
+      <!-- File Preview Box -->
+      <div class="file-preview-box" id="file-preview-box" style="display: none; align-items: center; justify-content: space-between; background: rgba(0, 229, 255, 0.06); border: 1px solid rgba(0, 229, 255, 0.2); padding: 1rem 1.25rem; border-radius: var(--radius-md); margin-top: 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <span style="font-size: 1.5rem;">📄</span>
+          <div>
+            <div id="preview-file-name" style="font-weight: 700; color: #FFFFFF; font-size: 0.95rem;"></div>
+            <div id="preview-file-size" style="font-size: 0.78rem; color: var(--text-muted);"></div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="change-file-btn">
+          Change File
+        </button>
+      </div>
+
+      <!-- Submit Button -->
+      <div style="margin-top: 2rem;">
+        <button type="submit" id="upload-submit-btn" class="btn btn-primary btn-lg" style="width: 100%; justify-content: center;" disabled>
+          <span>⚡ Start AI Prescription Analysis</span>
+        </button>
+      </div>
+    </form>
+
+    <!-- Immersive AI Scanning Screen (Active upon submit) -->
+    <div id="immersive-ai-scanner" style="display: none;" class="ai-scanner-screen">
+      <div class="scanner-beam"></div>
+
+      <div class="scanner-brand-title">MEDILENS AI CLINICAL ENGINE</div>
+      <h2 class="scanner-main-heading">ANALYZING PRESCRIPTION</h2>
+
+      <div class="scanner-stages-list">
+        <div class="scanner-stage-item active" id="stage-vision">
+          <span class="stage-icon">◉</span>
+          <span>Vision Analysis (Multimodal Gemini 3.5 Flash)</span>
+        </div>
+        <div class="scanner-stage-item" id="stage-ocr">
+          <span class="stage-icon">○</span>
+          <span>Text Recognition & OpenCV Enhancement</span>
+        </div>
+        <div class="scanner-stage-item" id="stage-medicine">
+          <span class="stage-icon">○</span>
+          <span>Medicine & Dosage Extraction</span>
+        </div>
+        <div class="scanner-stage-item" id="stage-verification">
+          <span class="stage-icon">○</span>
+          <span>Authoritative Medical Verification (OpenFDA / DailyMed)</span>
+        </div>
+        <div class="scanner-stage-item" id="stage-context">
+          <span class="stage-icon">○</span>
+          <span>Patient Age & Weight Clinical Assessment</span>
+        </div>
+        <div class="scanner-stage-item" id="stage-diet">
+          <span class="stage-icon">○</span>
+          <span>Dual-AI Dietary Precautions (क्या खाएं / न खाएं)</span>
+        </div>
+        <div class="scanner-stage-item" id="stage-careplan">
+          <span class="stage-icon">○</span>
+          <span>Personal Care Plan & Timeline Synthesis</span>
+        </div>
+      </div>
+
+      <div style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">
+        Processing high-resolution prescription elements. Please do not close this window...
+      </div>
+    </div>
+  </div>
+
+  <!-- Safety Reminder Notice -->
+  <div style="margin-top: 1.75rem; text-align: center; font-size: 0.82rem; color: var(--text-muted); line-height: 1.6;">
+    🔒 MediLens uses zero-retention HIPAA-aligned transient memory. If handwriting is illegible or ambiguous, our uncertainty-first design will explicitly flag items for verification.
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/prescription.js') }}"></script>
+{% endblock %}

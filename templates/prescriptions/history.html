@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Prescription History — MediLens AI{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto;">
+
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="font-size: 1.8rem; font-weight: 800;">Prescription History</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">Review past uploads, AI extractions, and verification audits.</p>
+    </div>
+    <a href="{{ url_for('prescriptions.upload') }}" class="btn btn-primary btn-sm">
+      + Upload New Prescription
+    </a>
+  </div>
+
+  <!-- Filter & Search Toolbar -->
+  <div class="card" style="padding: 1rem; margin-bottom: 1.5rem;">
+    <form method="GET" action="{{ url_for('prescriptions.history') }}" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+      <div style="flex: 2; min-width: 200px;">
+        <input type="text" name="search" class="form-control" placeholder="Search by patient, doctor, or filename..." value="{{ search_query or '' }}">
+      </div>
+
+      <div style="flex: 1; min-width: 160px;">
+        <select name="profile_id" class="form-control">
+          <option value="">All Profiles</option>
+          {% for p in profiles %}
+            <option value="{{ p.id }}" {% if selected_profile_id == p.id %}selected{% endif %}>
+              {{ p.name }} ({{ p.relationship }})
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-secondary btn-sm">Search</button>
+      {% if search_query or selected_profile_id %}
+        <a href="{{ url_for('prescriptions.history') }}" class="btn btn-outline-primary btn-sm">Clear</a>
+      {% endif %}
+    </form>
+  </div>
+
+  <!-- Prescriptions List -->
+  {% if prescriptions %}
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      {% for p in prescriptions %}
+        <div class="card" style="margin-bottom: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <h3 style="font-size: 1.2rem; font-weight: 700;">{{ p.original_filename }}</h3>
+                <span class="badge" style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); color: var(--text-main);">
+                  {{ p.file_type|upper }}
+                </span>
+                {% if p.has_unclear_fields %}
+                  <span class="badge badge-review">Review Pending</span>
+                {% else %}
+                  <span class="badge badge-verified">Verified</span>
+                {% endif %}
+              </div>
+
+              <div style="color: var(--text-muted); font-size: 0.88rem; margin-top: 0.4rem; display: flex; gap: 1.25rem; flex-wrap: wrap;">
+                <span>👤 Patient: <strong>{{ p.patient_name or (p.profile.name if p.profile else 'Me') }}</strong></span>
+                <span>👨‍⚕️ Prescriber: <strong>Dr. {{ p.doctor_name or 'Unspecified' }}</strong></span>
+                <span>📅 Date: <strong>{{ p.prescription_date or p.created_at.strftime('%Y-%m-%d') }}</strong></span>
+                <span>💊 Medicines: <strong>{{ p.medicines.count() }}</strong></span>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem;">
+              <a href="{{ url_for('prescriptions.result', prescription_id=p.id) }}" class="btn btn-primary btn-sm">
+                View Plan &rarr;
+              </a>
+              <form method="POST" action="{{ url_for('prescriptions.delete_prescription', prescription_id=p.id) }}" onsubmit="return confirm('Are you sure you want to delete this prescription and its schedules?');">
+                <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--danger);">
+                  🗑 Delete
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card" style="text-align: center; padding: 3rem 1rem;">
+      <p style="font-size: 2rem; margin-bottom: 0.5rem;">📂</p>
+      <h3>No prescriptions found</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+        {% if search_query %}No prescriptions matched your search terms.{% else %}You haven't uploaded any prescriptions yet.{% endif %}
+      </p>
+      <a href="{{ url_for('prescriptions.upload') }}" class="btn btn-primary btn-sm">
+        Upload Prescription
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

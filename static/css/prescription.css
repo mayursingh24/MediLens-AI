@@ -1,0 +1,563 @@
+/**
+ * ====================================================================
+ * MEDILENS AI — PRESCRIPTION INTELLIGENCE & CLINICAL SUITE
+ * Enterprise Apple Health x Linear Aesthetic
+ * Precision Hairlines • Frosted Glass Surfaces • Typographic Polish
+ * ====================================================================
+ */
+
+/* 1. Upload Dropzone */
+.dropzone-container {
+  border: 1px dashed rgba(0, 229, 255, 0.35);
+  border-radius: var(--radius-xl);
+  padding: 3.5rem 2rem;
+  text-align: center;
+  background: rgba(12, 17, 30, 0.65);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.dropzone-container:hover, .dropzone-container.drag-over {
+  border-color: var(--primary);
+  background: rgba(0, 229, 255, 0.04);
+  box-shadow: inset 0 1px 0 rgba(0, 229, 255, 0.2), 0 16px 40px rgba(0, 229, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.dropzone-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: inline-block;
+  animation: float-icon 3s ease-in-out infinite;
+}
+
+@keyframes float-icon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.dropzone-text h3 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin-bottom: 0.4rem;
+  color: #FFFFFF;
+}
+
+.dropzone-text p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* 2. Immersive AI Processing Screen */
+.ai-scanner-screen {
+  background: rgba(9, 13, 24, 0.92);
+  border: 1px solid var(--border-color-glow);
+  border-radius: var(--radius-xl);
+  padding: 3rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-ai-glow), 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.scanner-beam {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, #00E5FF 50%, transparent 100%);
+  box-shadow: 0 0 16px #00E5FF, 0 0 30px #00E5FF;
+  animation: scan-vertical 2.2s ease-in-out infinite;
+}
+
+@keyframes scan-vertical {
+  0% { top: 0%; opacity: 0.4; }
+  50% { top: 100%; opacity: 1; }
+  100% { top: 0%; opacity: 0.4; }
+}
+
+.scanner-brand-title {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--primary);
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.scanner-main-heading {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 2rem;
+  color: #FFFFFF;
+}
+
+.scanner-stages-list {
+  max-width: 360px;
+  margin: 0 auto 2.5rem;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.scanner-stage-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.scanner-stage-item.completed {
+  color: #FFFFFF;
+}
+
+.scanner-stage-item.completed .stage-icon {
+  color: var(--success);
+}
+
+.scanner-stage-item.active {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.scanner-stage-item.active .stage-icon {
+  color: var(--primary);
+  animation: pulse-stage 1.2s infinite;
+}
+
+@keyframes pulse-stage {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+/* 3. Prescription Map (Visual Timeline) */
+.prescription-map-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 1.75rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
+.map-timeline-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.map-timeline-row::before {
+  content: "";
+  position: absolute;
+  top: 22px;
+  left: 36px;
+  right: 36px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(0,229,255,0.3), rgba(99,102,241,0.3), rgba(168,85,247,0.3), rgba(245,158,11,0.3));
+  z-index: 1;
+}
+
+.map-time-slot {
+  flex: 1;
+  min-width: 140px;
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.slot-node {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #0B1020;
+  border: 1px solid var(--primary);
+  margin: 0 auto 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  box-shadow: 0 0 14px var(--primary-glow);
+}
+
+.slot-title {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.65rem;
+}
+
+.slot-medicines-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.map-med-chip {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.45rem 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  text-align: left;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.map-med-chip:hover {
+  background: rgba(0, 229, 255, 0.08);
+  border-color: rgba(0, 229, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+/* 4. Three-Part Medicine Intelligence Card */
+.medicine-intel-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  margin-bottom: 1.75rem;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.medicine-intel-card:hover {
+  border-color: var(--border-color-hover);
+  box-shadow: var(--shadow-lg);
+}
+
+.med-header-bar {
+  padding: 1.35rem 1.65rem;
+  background: rgba(255, 255, 255, 0.015);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.med-title-group h3 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.med-subtitle {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+.three-part-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.05fr;
+  gap: 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+@media (max-width: 992px) {
+  .three-part-layout { grid-template-columns: 1fr; }
+}
+
+.section-part {
+  padding: 1.4rem 1.65rem;
+}
+
+.section-part:not(:last-child) {
+  border-right: 1px solid var(--border-color);
+}
+
+@media (max-width: 992px) {
+  .section-part:not(:last-child) { border-right: none; border-bottom: 1px solid var(--border-color); }
+}
+
+.part-header {
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.part-prescription { background: rgba(0, 229, 255, 0.015); }
+.part-verified { background: rgba(99, 102, 241, 0.015); }
+.part-ai-explainer { background: rgba(168, 85, 247, 0.015); }
+
+/* 5. Confidence Layer Breakdown */
+.confidence-breakdown-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.45rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.confidence-pill {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
+}
+
+.confidence-high { background: rgba(16, 185, 129, 0.12); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.25); }
+.confidence-medium { background: rgba(245, 158, 11, 0.12); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.25); }
+.confidence-low { background: rgba(239, 68, 68, 0.12); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.25); }
+
+/* 6. Signature 'What Changed?' Diff Card */
+.what-changed-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 1.65rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(20px);
+}
+
+.diff-tag-new {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.diff-tag-removed {
+  background: rgba(239, 68, 68, 0.15);
+  color: #F87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.diff-tag-changed {
+  background: rgba(0, 229, 255, 0.15);
+  color: #38BDF8;
+  border: 1px solid rgba(0, 229, 255, 0.3);
+}
+
+/* 7. Clinical Alert & Safety Banners */
+.clinical-alerts-wrapper {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.clinical-alert-box {
+  border-radius: var(--radius-lg);
+  padding: 1.15rem 1.35rem;
+  border: 1px solid;
+  border-left: 3px solid;
+  backdrop-filter: blur(16px);
+  position: relative;
+  box-shadow: var(--shadow-sm);
+}
+
+.alert-danger-box {
+  background: rgba(239, 68, 68, 0.05);
+  border-color: rgba(239, 68, 68, 0.2);
+  border-left-color: #EF4444;
+}
+
+.alert-warning-box {
+  background: rgba(245, 158, 11, 0.05);
+  border-color: rgba(245, 158, 11, 0.2);
+  border-left-color: #F59E0B;
+}
+
+.alert-info-box {
+  background: rgba(0, 229, 255, 0.04);
+  border-color: rgba(0, 229, 255, 0.18);
+  border-left-color: #00E5FF;
+}
+
+.alert-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.4rem;
+}
+
+.alert-title {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.alert-body-text {
+  font-size: 0.85rem;
+  color: #CBD5E1;
+  line-height: 1.5;
+}
+
+.alert-management-box {
+  margin-top: 0.55rem;
+  padding: 0.55rem 0.8rem;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  color: #93C5FD;
+}
+
+/* 8. Independent Confidence Breakdown Grid */
+.confidence-meter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.meter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.meter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.meter-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.meter-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease-out;
+}
+
+.fill-high { background: #10B981; }
+.fill-med { background: #F59E0B; }
+.fill-low { background: #EF4444; }
+
+/* 9. Price Intelligence Banner inside medicine */
+.price-intel-box {
+  background: rgba(16, 185, 129, 0.05);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.15rem;
+  margin-top: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.price-numbers {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+}
+
+.price-generic {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #34D399;
+}
+
+.price-brand-strike {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  text-decoration: line-through;
+}
+
+.price-savings-badge {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34D399;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+/* Audio Player Equalizer Animation (Apple Podcasts style) */
+@keyframes audioBounce {
+  0% { transform: scaleY(0.25); }
+  100% { transform: scaleY(1.2); }
+}
+
+#equalizerWave span {
+  animation: audioBounce 0.45s infinite alternate ease-in-out;
+  transform-origin: bottom;
+}
+#equalizerWave span:nth-child(2) { animation-delay: 0.12s; }
+#equalizerWave span:nth-child(3) { animation-delay: 0.24s; }
+#equalizerWave span:nth-child(4) { animation-delay: 0.08s; }
+
+/* Clean PDF / Print Styles */
+@media print {
+  body {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  .navbar, .footer, #aiAudioPlayerBar, button, .btn, .map-time-slot, #carePlanForm button {
+    display: none !important;
+  }
+  .medicine-intel-card, .result-header, .card {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    border: 1px solid #CCCCCC !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+  .card-title, h1, h2, h3, h4, strong {
+    color: #000000 !important;
+  }
+}

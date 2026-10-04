@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Nearby Pharmacies — MediLens AI{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+
+  <div style="text-align: center; margin-bottom: 2rem;">
+    <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">Find Nearby Pharmacies</h1>
+    <p style="color: var(--text-muted); font-size: 1rem;">
+      Locate verified open pharmacies and medical stores with real navigation routes.
+    </p>
+  </div>
+
+  <!-- Search & Geolocation Controls -->
+  <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+    <form id="pharmacy-search-form">
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+        <div style="flex: 3; min-width: 240px;">
+          <label class="form-label" for="manual-address-input">Search Location / Landmark / City:</label>
+          <input type="text" id="manual-address-input" class="form-control" placeholder="e.g. Indiranagar, Bangalore or Connaught Place, New Delhi">
+        </div>
+
+        <div style="flex: 1; min-width: 140px;">
+          <label class="form-label" for="radius-select">Search Radius:</label>
+          <select id="radius-select" class="form-control">
+            <option value="2000">2 km</option>
+            <option value="5000" selected>5 km</option>
+            <option value="10000">10 km</option>
+            <option value="15000">15 km</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <button type="submit" class="btn btn-primary">
+          🔍 Search Pharmacies
+        </button>
+
+        <span style="color: var(--text-muted); font-size: 0.9rem;">— or —</span>
+
+        <button type="button" id="use-location-btn" class="btn btn-secondary">
+          📍 Use My Current Location
+        </button>
+      </div>
+
+      <!-- Quick Popular Cities -->
+      <div style="margin-top: 1rem; padding-top: 0.85rem; border-top: 1px dashed var(--border-color); display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+        <span style="font-size: 0.82rem; color: var(--text-muted);">Quick Search:</span>
+        <button type="button" class="btn btn-outline-secondary btn-sm quick-city-btn" data-city="Delhi">Delhi</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm quick-city-btn" data-city="Mumbai">Mumbai</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm quick-city-btn" data-city="Bengaluru">Bengaluru</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm quick-city-btn" data-city="Lucknow">Lucknow</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm quick-city-btn" data-city="Noida">Noida</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm quick-city-btn" data-city="Hyderabad">Hyderabad</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm quick-city-btn" data-city="Kolkata">Kolkata</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Results Status Indicator -->
+  <div id="pharmacy-search-status" style="margin-bottom: 1rem;"></div>
+
+  <!-- Results List Container -->
+  <div id="pharmacy-results-list"></div>
+
+  <!-- Medical Safety & Inventory Notice -->
+  <div class="card" style="background: var(--bg-card-subtle); padding: 1.25rem; margin-top: 2rem; font-size: 0.85rem; color: var(--text-muted);">
+    <strong>Pharmacy Stock Notice:</strong> MediLens AI provides verified geolocation coordinates and directions to nearby licensed pharmacies. Because medicine stock fluctuates constantly, please call or visit the pharmacy directly to confirm specific prescription availability.
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/pharmacy.js') }}"></script>
+{% endblock %}

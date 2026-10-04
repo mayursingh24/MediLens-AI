@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Clinical Consultation Summary — MediLens AI{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto; padding-bottom: 5rem;">
+
+  <!-- Print & Navigation Bar -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">
+        <a href="{{ url_for('prescriptions.result', prescription_id=prescription.id) }}" style="color: var(--text-muted); text-decoration: none;">&larr; Back to Care Plan</a>
+      </div>
+      <h1 style="font-size: 1.85rem; font-weight: 800; color: #FFFFFF; margin: 0;">
+        Clinical Consultation Handover Summary
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0.25rem 0 0 0;">
+        Synthesized clinical report designed for direct presentation to attending clinician or specialist.
+      </p>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem;">
+      <button type="button" class="btn btn-primary" onclick="window.print()" style="display: flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1.25rem; font-weight: 700; box-shadow: 0 0 20px var(--primary-glow);">
+        <span>🖨️</span> Print Doctor's Slip
+      </button>
+    </div>
+  </div>
+
+  <!-- Medical Document Sheet (White print-optimized inside midnight theme) -->
+  <div class="card" style="padding: 2.25rem; background: #080D1A; border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);">
+    
+    <!-- Top Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--border-color); padding-bottom: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <div style="font-size: 1.4rem; font-weight: 800; color: var(--primary); letter-spacing: -0.02em; display: flex; align-items: center; gap: 0.5rem;">
+          <span>⚕️</span> MediLens AI Clinical Brief
+        </div>
+        <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">
+          Automated Prescription Audit & Adherence Monitoring Platform
+        </div>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 0.82rem; color: var(--text-muted);">Generated On:</div>
+        <div style="font-size: 0.95rem; font-weight: 700; color: #FFFFFF;">{{ today }}</div>
+      </div>
+    </div>
+
+    <!-- Patient Demographics & Prescribing Physician Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.75rem;">
+      <div>
+        <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Patient Name</span>
+        <div style="font-size: 1.1rem; font-weight: 800; color: #FFFFFF; margin-top: 0.15rem;">
+          {{ profile.name if profile else prescription.patient_name }}
+        </div>
+        {% if profile %}
+          <div style="font-size: 0.78rem; color: var(--primary);">
+            {{ profile.age_category|title }} {% if profile.age %}({{ profile.age }} yrs){% endif %}
+            {% if profile.weight_kg %} &bull; {{ profile.weight_kg }} kg{% endif %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div>
+        <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Attending Physician</span>
+        <div style="font-size: 1.05rem; font-weight: 700; color: #E2E8F0; margin-top: 0.15rem;">
+          Dr. {{ prescription.doctor_name or 'Unspecified Clinician' }}
+        </div>
+        <div style="font-size: 0.78rem; color: var(--text-muted);">
+          Prescribed: {{ prescription.prescription_date or 'Recent' }}
+        </div>
+      </div>
+
+      <div>
+        <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Known Allergies</span>
+        <div style="font-size: 0.95rem; font-weight: 700; color: {% if profile and profile.known_allergies %}#F87171{% else %}#10B981{% endif %}; margin-top: 0.15rem;">
+          {{ profile.known_allergies if (profile and profile.known_allergies) else 'No drug allergies documented' }}
+        </div>
+      </div>
+
+      <div>
+        <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">14-Day Adherence</span>
+        <div style="font-size: 1.15rem; font-weight: 800; color: {% if adherence.adherence_percentage >= 80 %}#10B981{% else %}#F59E0B{% endif %}; margin-top: 0.15rem;">
+          {{ adherence.adherence_percentage }}% Compliant
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">
+          {{ adherence.taken }} taken / {{ adherence.missed + adherence.skipped }} missed
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Prescribed Regimen Table -->
+    <div style="margin-bottom: 2rem;">
+      <h3 style="font-size: 1.15rem; font-weight: 800; color: #FFFFFF; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>💊</span> Active Pharmacological Regimen
+      </h3>
+
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">
+              <th style="padding: 0.65rem 0.75rem;">Medicine / Brand</th>
+              <th style="padding: 0.65rem 0.75rem;">Active Substance</th>
+              <th style="padding: 0.65rem 0.75rem;">Strength & Form</th>
+              <th style="padding: 0.65rem 0.75rem;">Circadian Pattern</th>
+              <th style="padding: 0.65rem 0.75rem;">Meal Direction</th>
+              <th style="padding: 0.65rem 0.75rem;">Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for med in medicines %}
+              <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+                <td style="padding: 0.85rem 0.75rem; font-weight: 800; color: #FFFFFF;">
+                  {{ med.display_name }}
+                </td>
+                <td style="padding: 0.85rem 0.75rem; color: #94A3B8;">
+                  {{ med.generic_name or med.display_name }}
+                </td>
+                <td style="padding: 0.85rem 0.75rem; color: #E2E8F0;">
+                  {{ med.display_strength or 'Standard' }} &bull; {{ med.display_form or 'Tablet' }}
+                </td>
+                <td style="padding: 0.85rem 0.75rem;">
+                  <span style="font-weight: 800; color: var(--primary);">
+                    {{ med.morning|int }}-{{ med.afternoon|int }}-{{ med.night|int }}
+                  </span>
+                  <span style="font-size: 0.75rem; color: var(--text-muted); display: block;">
+                    {{ med.display_frequency }}
+                  </span>
+                </td>
+                <td style="padding: 0.85rem 0.75rem; color: #E2E8F0;">
+                  {{ med.display_food_instruction or 'After meals' }}
+                </td>
+                <td style="padding: 0.85rem 0.75rem; color: #34D399; font-weight: 700;">
+                  {{ med.display_duration_days }} Days
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Active Precautions & Clinical Flags -->
+    {% set safety = prescription.clinical_safety %}
+    {% if safety %}
+      <div style="margin-bottom: 2rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: #FFFFFF; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span>🛡️</span> AI Pharmacovigilance & Drug Interaction Review
+        </h3>
+
+        {% if safety.interactions and safety.interactions|length > 0 %}
+          <div style="background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem;">
+            <strong style="color: #F59E0B; font-size: 0.85rem; text-transform: uppercase; display: block; margin-bottom: 0.35rem;">
+              ⚠️ Potential Drug-Drug Interaction Detected:
+            </strong>
+            {% for inter in safety.interactions %}
+              <div style="font-size: 0.85rem; color: #E2E8F0; margin-bottom: 0.4rem;">
+                &bull; <strong>{{ inter.title }}:</strong> {{ inter.mechanism }} <em>(Rec: {{ inter.management }})</em>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-md); padding: 0.85rem 1rem; color: #34D399; font-size: 0.88rem;">
+            ✓ No major drug-drug interactions or duplicate toxicities detected in this combination.
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <!-- Doctor's Notes & Stamp Space -->
+    <div style="margin-top: 2rem; border-top: 2px dashed rgba(255, 255, 255, 0.15); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 2rem;">
+      <div style="flex: 1; min-width: 280px;">
+        <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">
+          Doctor's Consultation Observations / Modifications:
+        </span>
+        <div style="height: 60px; border-bottom: 1px solid rgba(255, 255, 255, 0.2);"></div>
+      </div>
+
+      <div style="text-align: right; min-width: 200px;">
+        <div style="height: 40px;"></div>
+        <div style="border-top: 1px solid rgba(255, 255, 255, 0.3); padding-top: 0.4rem; font-size: 0.8rem; color: var(--text-muted);">
+          Clinician Signature & Date
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

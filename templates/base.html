@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="{{ preferred_language or 'en' }}" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}MediLens AI — Premium Prescription Intelligence{% endblock %}</title>
+  
+  <!-- Premium Typography: Plus Jakarta Sans, Inter, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/prescription.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+  
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/logo.svg') }}">
+  <script>
+    (function() {
+      try {
+        let t = localStorage.getItem("medilens_theme");
+        if (!t || t === "light") {
+          t = "dark";
+          localStorage.setItem("medilens_theme", "dark");
+        }
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Top App Navigation -->
+  <header class="app-header">
+    <div class="nav-container">
+      <a href="{{ url_for('dashboard.index') if session.get('user_id') else url_for('dashboard.root') }}" class="brand-logo">
+        <div class="brand-logo-icon">M</div>
+        <span class="brand-text">MediLens<span style="color: var(--primary);">AI</span></span>
+      </a>
+
+      {% if session.get('user_id') %}
+      <nav class="nav-links">
+        <a href="{{ url_for('dashboard.index') }}" class="nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}">Dashboard</a>
+        <a href="{{ url_for('prescriptions.upload') }}" class="nav-link {% if request.endpoint and ('prescriptions.upload' in request.endpoint or 'prescriptions.processing' in request.endpoint) %}active{% endif %}" style="color: var(--primary); font-weight: 700;">⚡ Scan</a>
+        <a href="{{ url_for('schedule.index') }}" class="nav-link {% if request.endpoint and 'schedule' in request.endpoint %}active{% endif %}">Timeline</a>
+        <a href="{{ url_for('medicines.index') }}" class="nav-link {% if request.endpoint and 'medicines' in request.endpoint %}active{% endif %}">Medicines</a>
+        <a href="{{ url_for('pharmacy.index') }}" class="nav-link {% if request.endpoint and 'pharmacy' in request.endpoint %}active{% endif %}">Pharmacies</a>
+        <a href="{{ url_for('assistant.chat') }}" class="nav-link {% if request.endpoint and 'assistant' in request.endpoint %}active{% endif %}">AI Health</a>
+        <a href="{{ url_for('profiles.index') }}" class="nav-link {% if request.endpoint and 'profiles' in request.endpoint %}active{% endif %}">Profiles</a>
+      </nav>
+      {% endif %}
+
+      <div class="nav-actions">
+        <!-- Dual AI Badge -->
+        <span style="font-size: 0.72rem; font-weight: 800; color: #00E5FF; background: rgba(0, 229, 255, 0.1); padding: 0.25rem 0.65rem; border-radius: var(--radius-full); border: 1px solid rgba(0, 229, 255, 0.3); display: inline-flex; align-items: center; gap: 0.3rem;">
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: #00E5FF; box-shadow: 0 0 6px #00E5FF;"></span>
+          Dual AI (Gemini + Groq)
+        </span>
+
+        <!-- Language Selector -->
+        <select id="global-lang-select" class="form-control" style="width: auto; padding: 0.3rem 0.55rem; font-size: 0.8rem; background: rgba(255,255,255,0.06); border-radius: var(--radius-full);" aria-label="Language selector">
+          <option value="en" {% if preferred_language == 'en' %}selected{% endif %}>English</option>
+          <option value="hi" {% if preferred_language == 'hi' %}selected{% endif %}>हिंदी</option>
+          <option value="hinglish" {% if preferred_language == 'hinglish' %}selected{% endif %}>Hinglish</option>
+        </select>
+
+        {% if session.get('user_id') %}
+          <a href="{{ url_for('profiles.index') }}" class="badge badge-ai" style="font-size: 0.8rem; padding: 0.35rem 0.7rem; text-decoration: none;">
+            👤 {{ active_user_name or 'Patient' }}
+          </a>
+          <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary btn-sm" style="font-size: 0.78rem; padding: 0.35rem 0.65rem;">Logout</a>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}" class="btn btn-secondary btn-sm">Log In</a>
+          <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Get Started</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Wrapper -->
+  <main class="main-content">
+    {% if request.endpoint != 'dashboard.root' and request.endpoint != 'landing' %}
+    <!-- Medical Safety Disclaimer Banner (Shown on internal application pages) -->
+    <div class="card" style="padding: 0.75rem 1.25rem; margin-bottom: 2rem; background: rgba(0, 229, 255, 0.04); border-color: rgba(0, 229, 255, 0.18); font-size: 0.85rem; display: flex; align-items: center; gap: 0.75rem;">
+      <span style="font-size: 1.1rem;">🛡️</span>
+      <span style="color: var(--text-secondary);">
+        <strong>Clinical AI Safeguard:</strong> MediLens AI provides prescription transcription, verified pharmacology data, and personalized schedule timelines. It does not provide medical diagnosis or replace physician consultation. Always confirm treatments with your doctor or pharmacist.
+      </span>
+    </div>
+    {% endif %}
+
+    <!-- Error Display (if rendered by error handler) -->
+    {% if error_title %}
+      <div class="card" style="text-align: center; padding: 3rem 1.5rem; max-width: 600px; margin: 2rem auto;">
+        <h2 style="font-size: 1.8rem; font-weight: 800; color: var(--danger); margin-bottom: 0.5rem;">{{ error_title }}</h2>
+        <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 1.5rem;">{{ error_message }}</p>
+        <a href="/" class="btn btn-primary btn-sm">Return to Home</a>
+      </div>
+    {% endif %}
+
+    <!-- Flash Notifications -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="margin-bottom: 1.5rem;">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+              <span>{{ message }}</span>
+              <button type="button" onclick="this.parentElement.remove()" style="background:none; border:none; color:inherit; cursor:pointer; font-weight:bold; margin-left:auto;">&times;</button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  {% if session.get('user_id') %}
+  <!-- Mobile Bottom Navigation (Visible on screen <= 768px) -->
+  <nav class="mobile-bottom-nav">
+    <a href="{{ url_for('dashboard.index') }}" class="mobile-nav-item {% if request.endpoint == 'dashboard.index' %}active{% endif %}">
+      <span class="icon">🏠</span>
+      <span>Home</span>
+    </a>
+    <a href="{{ url_for('prescriptions.upload') }}" class="mobile-nav-item {% if request.endpoint and 'prescriptions.upload' in request.endpoint %}active{% endif %}">
+      <span class="icon">⚡</span>
+      <span>Scan</span>
+    </a>
+    <a href="{{ url_for('schedule.index') }}" class="mobile-nav-item {% if request.endpoint and 'schedule' in request.endpoint %}active{% endif %}">
+      <span class="icon">⏱</span>
+      <span>Timeline</span>
+    </a>
+    <a href="{{ url_for('medicines.index') }}" class="mobile-nav-item {% if request.endpoint and 'medicines' in request.endpoint %}active{% endif %}">
+      <span class="icon">💊</span>
+      <span>Meds</span>
+    </a>
+    <a href="{{ url_for('assistant.chat') }}" class="mobile-nav-item {% if request.endpoint and 'assistant' in request.endpoint %}active{% endif %}">
+      <span class="icon">🤖</span>
+      <span>AI</span>
+    </a>
+  </nav>
+
+  <!-- Floating 'Ask MediLens' AI Button -->
+  <button type="button" class="floating-ai-trigger" id="global-ai-trigger" title="Ask MediLens AI anything about your prescriptions">
+    <div class="ai-pulse-dot"></div>
+    <span>Ask MediLens</span>
+  </button>
+
+  <!-- Slide-Over 'Ask MediLens' Drawer Panel -->
+  <div id="ai-slide-drawer" style="display:none; position:fixed; top:0; right:0; bottom:0; width:100%; max-width:440px; background:rgba(8,12,20,0.95); backdrop-filter:blur(25px); border-left:1px solid var(--border-color); z-index:200; box-shadow:var(--shadow-lg); flex-direction:column;">
+    <div style="padding:1.25rem 1.5rem; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+      <div style="display:flex; align-items:center; gap:0.5rem;">
+        <span style="font-size:1.2rem;">✨</span>
+        <h3 style="font-size:1.1rem; font-weight:800; color:#FFFFFF;">Ask MediLens AI</h3>
+      </div>
+      <button type="button" id="close-ai-drawer-btn" style="background:none; border:none; color:var(--text-muted); font-size:1.5rem; cursor:pointer;">&times;</button>
+    </div>
+
+    <!-- Quick questions chip bar -->
+    <div style="padding:0.75rem 1rem; border-bottom:1px solid var(--border-color); display:flex; gap:0.4rem; overflow-x:auto; white-space:nowrap; background:rgba(255,255,255,0.02);">
+      <button type="button" class="btn btn-outline-secondary btn-sm drawer-quick-btn" data-q="What medicines are in my prescription?">📋 My Medicines</button>
+      <button type="button" class="btn btn-outline-secondary btn-sm drawer-quick-btn" data-q="When is my next dose?">⏰ Next Dose</button>
+      <button type="button" class="btn btn-outline-secondary btn-sm drawer-quick-btn" data-q="Are there any drug interactions?">⚠️ Interactions</button>
+      <button type="button" class="btn btn-outline-secondary btn-sm drawer-quick-btn" data-q="What is scheduled tonight?">🌙 Tonight's Meds</button>
+    </div>
+
+    <!-- Drawer Messages Container -->
+    <div id="drawer-messages" style="flex:1; overflow-y:auto; padding:1.25rem; display:flex; flex-direction:column; gap:0.75rem;">
+      <div style="background:rgba(255,255,255,0.04); border:1px solid var(--border-color); padding:0.85rem 1rem; border-radius:var(--radius-md); font-size:0.88rem; color:var(--text-secondary);">
+        👋 Hello! I am your <strong>MediLens AI Health Assistant</strong>. Ask me anything about your prescribed medicines, timing, food directions, or precautions.
+      </div>
+    </div>
+
+    <!-- Drawer Input Form -->
+    <form id="drawer-chat-form" style="padding:1rem; border-top:1px solid var(--border-color); display:flex; gap:0.5rem; align-items:center; background:rgba(12,16,28,0.9);">
+      <input type="text" id="drawer-chat-input" class="form-control" placeholder="Ask about medicines, timings..." style="font-size:0.88rem;" required autocomplete="off">
+      <button type="submit" class="btn btn-primary btn-sm" style="padding:0.6rem 1rem;">Ask</button>
+    </form>
+  </div>
+  {% endif %}
+
+  <!-- App Footer -->
+  <footer style="border-top: 1px solid var(--border-color); padding: 2rem 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: auto;">
+    <div style="max-width: 1240px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div style="display:flex; align-items:center; gap:0.5rem;">
+        <span style="font-weight:700; color:#FFFFFF;">MediLens AI</span>
+        <span>•</span>
+        <span>Your prescription, understood.</span>
+      </div>
+      <div>
+        <span>Authoritative intelligence from OpenFDA, DailyMed & NIH MedlinePlus</span>
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>
