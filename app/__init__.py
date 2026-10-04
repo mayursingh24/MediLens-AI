@@ -36,9 +36,13 @@ def create_app(config_class=Config):
     # Automatically create missing database tables on boot
     with app.app_context():
         try:
+            from app.models import User, Profile, Prescription, Medicine, Schedule, MedicationLog, Notification, AuditLog
             db.create_all()
+            from app.utils.db_sync import sync_database_schema
+            sync_database_schema()
+            app.logger.info("Database schema initialized and synced on boot.")
         except Exception as e:
-            app.logger.warning(f"Startup db.create_all() deferred: {e}")
+            app.logger.warning(f"Startup db initialization deferred: {e}")
 
     # Register CLI commands
     @app.cli.command("init-db")

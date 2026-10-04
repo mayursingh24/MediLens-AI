@@ -76,8 +76,8 @@ def register():
         except Exception as e:
             db.session.rollback()
             logger.error(f"Error registering user {email}: {e}")
-            flash("An unexpected error occurred during registration. Please try again.", "danger")
-            return render_template("register.html", email=email, full_name=full_name), 500
+            flash(f"Registration error: {str(e)}", "danger")
+            return render_template("register.html", email=email, full_name=full_name), 400
 
     return render_template("register.html")
 
@@ -97,36 +97,42 @@ def login():
             flash("Please enter both email and password.", "danger")
             return render_template("login.html", email=email), 400
 
-        user = User.query.filter_by(email=email).first()
-        if not user or not user.check_password(password):
-            flash("Invalid email or password.", "danger")
-            return render_template("login.html", email=email), 401
+        try:
+            user = User.query.filter_by(email=email).first()
+            if not user or not user.check_password(password):
+                flash("Invalid email or password.", "danger")
+                return render_template("login.html", email=email), 401
 
-        if not user.is_active:
-            flash("Your account has been deactivated. Please contact support.", "danger")
-            return render_template("login.html", email=email), 403
+            if not user.is_active:
+                flash("Your account has been deactivated. Please contact support.", "danger")
+                return render_template("login.html", email=email), 403
 
-        # Locate default or first profile
-        default_profile = Profile.query.filter_by(user_id=user.id, is_default=True).first()
-        if not default_profile:
-            default_profile = Profile.query.filter_by(user_id=user.id).first()
-        if not default_profile:
-            default_profile = Profile(user_id=user.id, name=user.full_name, relationship="Me", is_default=True)
-            db.session.add(default_profile)
-            db.session.commit()
+            # Locate default or first profile
+            default_profile = Profile.query.filter_by(user_id=user.id, is_default=True).first()
+            if not default_profile:
+                default_profile = Profile.query.filter_by(user_id=user.id).first()
+            if not default_profile:
+                default_profile = Profile(user_id=user.id, name=user.full_name, relationship="Me", is_default=True)
+                db.session.add(default_profile)
+                db.session.commit()
 
-        session["user_id"] = user.id
-        session["user_name"] = user.full_name
-        session["user_email"] = user.email
-        session["active_profile_id"] = default_profile.id
-        session["preferred_language"] = user.preferred_language
+            session["user_id"] = user.id
+            session["user_name"] = user.full_name
+            session["user_email"] = user.email
+            session["active_profile_id"] = default_profile.id
+            session["preferred_language"] = user.preferred_language
 
-        record_audit("USER_LOGIN", "user", user.id)
+            record_audit("USER_LOGIN", "user", user.id)
 
-        next_url = session.pop("next_url", None)
-        if next_url and next_url.startswith("/"):
-            return redirect(next_url)
-        return redirect(url_for("dashboard.index"))
+            next_url = session.pop("next_url", None)
+            if next_url and next_url.startswith("/"):
+                return redirect(next_url)
+            return redirect(url_for("dashboard.index"))
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Login error for {email}: {e}")
+            flash(f"Login error: {str(e)}", "danger")
+            return render_template("login.html", email=email), 400
 
     return render_template("login.html")
 
