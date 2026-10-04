@@ -33,6 +33,13 @@ def create_app(config_class=Config):
     # Register Blueprints
     register_blueprints(app)
 
+    # Automatically create missing database tables on boot
+    with app.app_context():
+        try:
+            db.create_all()
+        except Exception as e:
+            app.logger.warning(f"Startup db.create_all() deferred: {e}")
+
     # Register CLI commands
     @app.cli.command("init-db")
     def init_db_command():

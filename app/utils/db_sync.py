@@ -13,11 +13,21 @@ def sync_database_schema():
     - Creates missing feature tables ('profiles', 'schedules', 'medication_logs', 'notifications', 'audit_logs') with proper FKs and indexes.
     - Never drops database or deletes any data.
     """
-    host = current_app.config["MYSQL_HOST"]
-    port = current_app.config["MYSQL_PORT"]
-    user = current_app.config["MYSQL_USER"]
-    password = current_app.config["MYSQL_PASSWORD"]
-    database = current_app.config["MYSQL_DATABASE"]
+    import urllib.parse
+    db_url = current_app.config.get("DATABASE_URL")
+    if db_url:
+        parsed = urllib.parse.urlparse(db_url.replace("mysql+pymysql://", "mysql://"))
+        host = parsed.hostname or "localhost"
+        port = parsed.port or 3306
+        user = urllib.parse.unquote(parsed.username or "root")
+        password = urllib.parse.unquote(parsed.password or "")
+        database = parsed.path.lstrip("/") or "medilens"
+    else:
+        host = current_app.config.get("MYSQL_HOST", "localhost")
+        port = int(current_app.config.get("MYSQL_PORT", 3306))
+        user = current_app.config.get("MYSQL_USER", "root")
+        password = current_app.config.get("MYSQL_PASSWORD", "")
+        database = current_app.config.get("MYSQL_DATABASE", "medilens")
 
     conn = pymysql.connect(
         host=host,
