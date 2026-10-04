@@ -96,3 +96,7 @@ def create_app(config_class=Config):
         return render_template("base.html", error_title="Server Error", error_message=msg), 500
 
     return app
+
+
+# Export module-level app instance so both `gunicorn app:app` and `gunicorn wsgi:app` work seamlessly
+app = create_app()
