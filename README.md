@@ -6,7 +6,7 @@
 [![Framework](https://img.shields.io/badge/framework-Flask%203.1.3-informational.svg?style=flat-square)](https://flask.palletsprojects.com/)
 [![Database](https://img.shields.io/badge/database-MySQL%208.0%2B-orange.svg?style=flat-square)](https://www.mysql.com/)
 [![AI Vision](https://img.shields.io/badge/AI%20Vision-Google%20Gemini%202.5%20%2B%20Groq%20120B-cyan.svg?style=flat-square)](https://aistudio.google.com/)
-[![Design System](https://img.shields.io/badge/UI%2FUX-HackerRank%20%C3%97%20Linear%20SaaS-blueviolet.svg?style=flat-square)](#8-uiux-design-system)
+[![Design System](https://img.shields.io/badge/design-Apple%20Health%20%C3%97%20Linear-blueviolet.svg?style=flat-square)](#9-uiux-design-system)
 [![Deployment](https://img.shields.io/badge/deployment-Railway%20Cloud-success.svg?style=flat-square&logo=railway)](https://medilens-ai-production-d76e.up.railway.app/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE)
 
@@ -15,7 +15,7 @@
 
 ---
 
-> **"Understand Your Prescription. With AI."**  
+> **"Turn a prescription into a complete, 24-hour verifiable care plan in seconds."**  
 > MediLens AI transforms handwritten doctor prescriptions, clinical shorthand (`1-0-1`, `TDS`, `BD`, `HS`), and hospital discharge slips into an interactive circadian schedule, verified pharmacology intelligence, dietary precautions, and PMBJP Jan Aushadhi generic savings.
 
 ---
@@ -30,7 +30,7 @@
 6. [Real Medicine Verification & Monograph Engine](#6-real-medicine-verification--monograph-engine)
 7. [Patient Context & Pediatric Safety](#7-patient-context--pediatric-safety)
 8. [Enterprise Features](#8-enterprise-features)
-9. [UI/UX Design System (HackerRank SaaS Inspired)](#9-uiux-design-system-hackerrank-saas-inspired)
+9. [UI/UX Design System](#9-uiux-design-system)
 10. [Database Architecture & Entity-Relationship Diagram](#10-database-architecture--entity-relationship-diagram)
 11. [Repository Structure](#11-repository-structure)
 12. [Complete Windows Installation Guide from Zero](#12-complete-windows-installation-guide-from-zero)
@@ -195,20 +195,17 @@ MediLens AI links every prescription to a specific **Patient Profile**:
 
 ---
 
-## 9. UI/UX Design System (HackerRank SaaS Inspired)
+## 9. UI/UX Design System
 
-MediLens AI features a sophisticated, modern dark interface inspired by **HackerRank SaaS and Linear.app**:
-- **Canvas & Atmosphere**: Deep obsidian canvas (`#05070E`) with atmospheric multi-color radial glows in electric cyan, indigo, and emerald.
-- **Specular Glass Surfaces**: Translucent glass cards with specular hairlines (`border: 1px solid rgba(255, 255, 255, 0.09)`) and top highlight rims (`box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12)`).
-- **Typography Hierarchy**:
-  - **Headings**: `Plus Jakarta Sans` (Tight tracking `-0.035em`, bold 700/800 weights).
-  - **UI Body**: `Inter` (Optimized legibility, high-contrast text `#F8FAFC` and `#CBD5E1`).
-  - **Clinical Monospace**: `JetBrains Mono` for dosage codes, API latencies, and price metrics.
-- **Visual 3-Stage Showcase**: Interactive representation of `Prescription Document ➔ Dual-AI Vision ➔ Verified Clinical Intelligence`.
-- **Comprehensive Breakpoint Responsiveness**:
-  - **Desktop (1440px, 1280px, 1024px)**: Generous spacing, multi-column bento grids, and spacious 3-stage preview pipelines.
-  - **Tablet (912px, 820px, 768px)**: Fluid typography scaling, auto-collapsing columns, and horizontally scrollable tables.
-  - **Mobile (390px, 375px, 360px)**: Zero horizontal scrolling, thumb-friendly tap targets (minimum 44px height), full-width primary CTAs, and sticky mobile navigation.
+MediLens AI features a bespoke design system inspired by **Apple Health and Linear.app**:
+- **Color Palette**: Deep Obsidian (`#06080F`), Electric Cyan (`#00E5FF`), Soft Sapphire (`#38BDF8`), Emerald (`#10B981`), Amber (`#F59E0B`), and Rose (`#EF4444`).
+- **Typography Stack**:
+  - **Headings**: `Plus Jakarta Sans` (Tight tracking `-0.025em`, crisp weights 600/700/800).
+  - **Body Copy**: `Inter` (1.6 line height, ultra-clean contrast).
+  - **Clinical Numbers & Timers**: `JetBrains Mono` (Dosages, confidence meters, countdown tickers).
+- **Glassmorphism**: 20px blur with $180\%$ saturation (`backdrop-filter: blur(20px) saturate(180%)`) and 1px top specular hairlines (`border-top: 1px solid rgba(255, 255, 255, 0.12)`).
+- **Tactile Buttons**: Hardware-style micro-specular bevel reflection (`box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 4px 14px rgba(0,229,255,0.22)`).
+- **Responsive Architecture**: Fluid layout support for Desktop (1440px), Tablet (768px), and Mobile (360px–390px).
 
 ---
 

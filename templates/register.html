@@ -1,59 +1,49 @@
 {% extends "base.html" %}
 
-{% block title %}Create Account — MediLens AI Platform{% endblock %}
+{% block title %}Create Account — MediLens AI{% endblock %}
 
 {% block content %}
-<div style="max-width: 500px; margin: 3rem auto 4rem;">
-  
-  <div class="card card-ai-glow" style="padding: 2.75rem 2.25rem; background: linear-gradient(135deg, rgba(12, 17, 33, 0.95) 0%, rgba(16, 22, 44, 0.92) 100%); border-radius: var(--radius-xl); border: 1px solid rgba(0, 229, 255, 0.28);">
-    
-    <div style="text-align: center; margin-bottom: 2.25rem;">
-      <div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.85rem; border-radius: var(--radius-full); background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.25); font-size: 0.72rem; color: var(--primary); font-weight: 800; margin-bottom: 1rem; text-transform: uppercase;">
+<div style="max-width: 480px; margin: 2rem auto;">
+  <div class="card card-ai-glow" style="padding: 2.5rem 2rem; background: linear-gradient(135deg, rgba(12, 17, 33, 0.95) 0%, rgba(16, 22, 44, 0.92) 100%); border-radius: var(--radius-xl);">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.65rem; border-radius: 9999px; background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.25); font-size: 0.72rem; color: var(--primary); font-weight: 800; margin-bottom: 0.75rem; text-transform: uppercase;">
         ⚡ Join MediLens AI Platform
       </div>
-      <h2 style="font-size: 1.85rem; font-weight: 800; color: #FFFFFF; margin-bottom: 0.4rem; letter-spacing: -0.025em;">
-        Create Your Account
-      </h2>
-      <p style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.5;">
-        Autonomous prescription transcription and personalized circadian care plans.
-      </p>
+      <h2 style="font-size: 1.75rem; font-weight: 800; color: #FFFFFF; margin-bottom: 0.35rem; letter-spacing: -0.02em;">Create Your Account</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">Autonomous prescription intelligence and personalized care plans</p>
     </div>
 
     <form method="POST" action="{{ url_for('auth.register') }}" id="register-form">
-      <div class="form-group" style="margin-bottom: 1.35rem;">
+      <div class="form-group">
         <label class="form-label" for="full_name">Full Name</label>
-        <input type="text" id="full_name" name="full_name" class="form-control" placeholder="Rajesh Verma" value="{{ full_name or '' }}" required autofocus autocomplete="name">
+        <input type="text" id="full_name" name="full_name" class="form-control" placeholder="Jane Doe" value="{{ full_name or '' }}" required autofocus>
       </div>
 
-      <div class="form-group" style="margin-bottom: 1.35rem;">
+      <div class="form-group">
         <label class="form-label" for="email">Email Address</label>
-        <input type="email" id="email" name="email" class="form-control" placeholder="name@example.com" value="{{ email or '' }}" required autocomplete="email">
+        <input type="email" id="email" name="email" class="form-control" placeholder="name@example.com" value="{{ email or '' }}" required>
       </div>
 
-      <div class="form-group" style="margin-bottom: 1.35rem;">
+      <div class="form-group">
         <label class="form-label" for="password">Password</label>
-        <input type="password" id="password" name="password" class="form-control" placeholder="Min. 8 characters with numbers" required autocomplete="new-password">
-        <small style="color: var(--text-muted); font-size: 0.78rem; margin-top: 0.3rem; display: block;">
-          Must be at least 8 characters and include at least one number.
-        </small>
+        <input type="password" id="password" name="password" class="form-control" placeholder="Min. 8 chars with a number" required>
+        <small style="color: var(--text-muted); font-size: 0.78rem;">Must be at least 8 characters and include at least one number.</small>
       </div>
 
-      <div class="form-group" style="margin-bottom: 1.75rem;">
+      <div class="form-group">
         <label class="form-label" for="confirm_password">Confirm Password</label>
-        <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Repeat your password" required autocomplete="new-password">
+        <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Repeat your password" required>
       </div>
 
-      <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; justify-content: center; font-size: 1rem;">
-        Register Patient Account &rarr;
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.75rem; padding: 0.7rem;">
+        Register Account
       </button>
     </form>
 
-    <div style="text-align: center; margin-top: 2rem; font-size: 0.88rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
-      Already have an account? <a href="{{ url_for('auth.login') }}" style="font-weight: 700;">Sign In</a>
+    <div style="text-align: center; margin-top: 1.5rem; font-size: 0.88rem; color: var(--text-muted);">
+      Already have an account? <a href="{{ url_for('auth.login') }}">Log In</a>
     </div>
-
   </div>
-
 </div>
 {% endblock %}
 

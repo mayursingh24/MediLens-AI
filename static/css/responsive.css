@@ -1,376 +1,101 @@
-/**
- * ====================================================================
- * MEDILENS AI — COMPREHENSIVE RESPONSIVE DESIGN ARCHITECTURE
- * Desktop (1440px, 1280px, 1024px)
- * Tablet (912px, 820px, 768px)
- * Mobile (390px, 375px, 360px)
- * ====================================================================
- */
-
-/* ====================================================================
-   1. DESKTOP OPTIMIZATIONS (1440px -> 1025px)
-   ==================================================================== */
-@media (min-width: 1025px) {
-  .hero-container {
-    padding: 5rem 1.5rem 4rem;
-  }
-  
-  .saas-preview-grid {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr auto 1fr;
-    gap: 1rem;
-    align-items: stretch;
-  }
+/* Bottom Navigation for Mobile */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-color: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  z-index: 1000;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
 }
 
-@media (max-width: 1280px) {
-  .nav-container {
-    padding: 0 1.25rem;
-  }
-
-  .main-content {
-    padding: 1.75rem 1.25rem 4.5rem;
-  }
-
-  .bento-grid {
-    gap: 1.25rem;
-  }
+.mobile-nav-container {
+  display: flex;
+  height: 100%;
+  justify-content: space-around;
+  align-items: center;
 }
 
-@media (max-width: 1024px) {
-  .nav-links {
-    gap: 0.15rem;
-  }
+.mobile-nav-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-decoration: none;
+  flex: 1;
+  height: 100%;
+  gap: 0.2rem;
+}
 
-  .nav-link {
-    font-size: 0.82rem;
-    padding: 0.35rem 0.75rem;
-  }
+.mobile-nav-link.active, .mobile-nav-link:hover {
+  color: var(--primary);
+}
 
+.mobile-nav-icon {
+  font-size: 1.15rem;
+}
+
+/* Tablet & Mobile Media Queries */
+@media (max-width: 992px) {
   .dashboard-grid {
-    grid-template-columns: repeat(12, 1fr);
+    grid-template-columns: 1fr;
   }
 
-  .col-8, .col-7 {
+  .col-8, .col-7, .col-6, .col-5, .col-4 {
     grid-column: span 12;
-  }
-
-  .col-5, .col-4 {
-    grid-column: span 12;
-  }
-
-  .saas-preview-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
-
-  .saas-flow-connector {
-    transform: rotate(90deg);
-    margin: 0.5rem auto;
   }
 }
 
-/* ====================================================================
-   2. TABLET OPTIMIZATIONS (912px, 820px, 768px)
-   ==================================================================== */
-@media (max-width: 912px) {
-  .hero-headline {
-    font-size: 2.8rem !important;
-    line-height: 1.15 !important;
+@media (max-width: 768px) {
+  .nav-links {
+    display: none; /* Handled by mobile bottom nav */
   }
 
-  .bento-col-7,
-  .bento-col-5,
-  .bento-col-4 {
-    grid-column: span 12 !important;
+  .mobile-bottom-nav {
+    display: block;
   }
 
-  .card {
-    padding: 1.5rem;
+  body {
+    padding-bottom: 70px; /* Room for bottom navigation */
+  }
+
+  .main-wrapper {
+    margin-top: 1rem;
+    padding: 0 1rem;
+  }
+
+  .timing-inputs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .xai-comparison-row {
+    grid-template-columns: 1fr;
   }
 
   .dashboard-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
   }
 
-  .dashboard-header-actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
-}
-
-@media (max-width: 820px) {
-  .nav-actions .dual-ai-badge {
-    display: none !important;
-  }
-
-  .demo-tabs-container {
-    overflow-x: auto;
-    max-width: 100%;
-    padding-bottom: 0.35rem;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .timing-inputs-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-}
-
-@media (max-width: 768px) {
-  /* Hide Desktop Top Navigation links and show bottom bar */
-  .nav-links {
-    display: none !important;
-  }
-
-  .mobile-bottom-nav {
-    display: flex !important;
-  }
-
-  body {
-    padding-bottom: 74px; /* Clearance for fixed mobile bottom nav */
-  }
-
-  .main-content {
-    padding: 1.25rem 1rem 6rem;
-  }
-
-  /* Typography Fluid Downscaling */
-  .hero-headline {
-    font-size: 2.2rem !important;
-    letter-spacing: -0.025em !important;
-  }
-
-  .hero-subhead {
-    font-size: 1rem !important;
-    line-height: 1.6 !important;
-    margin-bottom: 2rem !important;
-  }
-
-  /* Primary Call to Action on Tablet/Mobile */
-  .hero-cta-group {
+  .dose-item {
     flex-direction: column;
-    width: 100%;
+    align-items: flex-start;
     gap: 0.75rem;
   }
 
-  .hero-cta-group .btn {
-    width: 100% !important;
-    justify-content: center;
-  }
-
-  /* Prescriptions Result Page Stacking */
-  .result-header-row {
-    flex-direction: column;
-    align-items: flex-start !important;
-    gap: 1rem !important;
-  }
-
-  .result-header-actions {
+  .dose-actions {
     width: 100%;
-    display: grid !important;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem !important;
-  }
-
-  .result-header-actions .btn {
-    width: 100%;
-    padding: 0.55rem 0.65rem;
-    font-size: 0.78rem;
-    justify-content: center;
-  }
-
-  /* Dropzone responsive fit */
-  .dropzone-container {
-    padding: 2.25rem 1.25rem;
-  }
-
-  .dropzone-icon {
-    font-size: 2.5rem;
-  }
-
-  /* Timetable Horizontal Scrolling on Tablet */
-  .map-timeline-row {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .map-timeline-row::before {
-    display: none;
-  }
-
-  .map-time-slot {
-    width: 100%;
-    text-align: left;
-    display: flex;
-    gap: 1rem;
-    align-items: flex-start;
-  }
-
-  .slot-node {
-    margin: 0;
-    flex-shrink: 0;
-  }
-
-  .slot-content-wrapper {
-    flex: 1;
-  }
-
-  /* Table horizontal responsiveness */
-  .table-responsive-wrapper {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: var(--radius-md);
-  }
-
-  .table-responsive-wrapper table {
-    min-width: 580px;
-  }
-
-  /* Floating AI Button repositioned above mobile bottom bar */
-  .floating-ai-trigger {
-    bottom: 5.25rem !important;
-    right: 1rem !important;
-    padding: 0.55rem 1rem !important;
-    font-size: 0.8rem !important;
-  }
-
-  /* Slide drawer fullscreen on mobile */
-  #ai-slide-drawer {
-    max-width: 100% !important;
-  }
-}
-
-/* ====================================================================
-   3. MOBILE OPTIMIZATIONS (390px, 375px, 360px)
-   ==================================================================== */
-@media (max-width: 480px) {
-  /* Prevent any horizontal page leakage */
-  html, body {
-    overflow-x: hidden;
-    width: 100%;
-  }
-
-  .nav-container {
-    padding: 0 1rem;
-    height: 60px;
-  }
-
-  .brand-text {
-    font-size: 1.1rem;
-  }
-
-  .brand-logo-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 0.95rem;
-  }
-
-  .main-content {
-    padding: 1rem 0.85rem 6.5rem;
-  }
-
-  .card {
-    padding: 1.25rem 1rem;
-    border-radius: var(--radius-md);
-  }
-
-  /* Hero Mobile Refinements */
-  .hero-eyebrow {
-    font-size: 0.72rem !important;
-    padding: 0.35rem 0.85rem !important;
-    max-width: 100%;
-    text-align: center;
-  }
-
-  .hero-headline {
-    font-size: 1.95rem !important;
-    line-height: 1.2 !important;
-    margin-bottom: 1rem !important;
-  }
-
-  .hero-subhead {
-    font-size: 0.92rem !important;
-    line-height: 1.55 !important;
-    margin-bottom: 1.75rem !important;
-  }
-
-  /* Buttons thumb-friendly minimum 44px */
-  .btn {
-    min-height: 44px !important;
-    font-size: 0.88rem !important;
-    padding: 0.65rem 1.15rem !important;
+    justify-content: flex-end;
   }
 
   .btn-lg {
-    min-height: 50px !important;
-    font-size: 0.98rem !important;
-    width: 100%;
-  }
-
-  /* Upload dropzone mobile viewport fit */
-  .dropzone-container {
-    padding: 1.75rem 0.75rem;
-  }
-
-  .dropzone-text h3 {
-    font-size: 1.15rem;
-  }
-
-  .dropzone-text p {
-    font-size: 0.8rem;
-  }
-
-  .dropzone-actions {
-    flex-direction: column;
-    width: 100%;
-    gap: 0.5rem;
-  }
-
-  .dropzone-actions .btn {
-    width: 100%;
-  }
-
-  /* Trust Badges mobile wrapping */
-  .trust-strip {
-    gap: 0.75rem !important;
-    font-size: 0.72rem !important;
-  }
-
-  /* Audio player card mobile adaptation */
-  #aiAudioPlayerBar {
-    padding: 1rem !important;
-    border-radius: var(--radius-lg) !important;
-  }
-
-  /* Footer stack */
-  .footer-content-grid {
-    grid-template-columns: 1fr !important;
-    gap: 1.75rem !important;
-    text-align: left;
-  }
-}
-
-/* ====================================================================
-   4. ULTRA-COMPACT MOBILE (360px & 375px)
-   ==================================================================== */
-@media (max-width: 375px) {
-  .hero-headline {
-    font-size: 1.75rem !important;
-  }
-
-  .nav-container {
-    padding: 0 0.75rem;
-  }
-
-  .result-header-actions {
-    grid-template-columns: 1fr !important;
-  }
-
-  .btn {
-    font-size: 0.82rem !important;
+    padding: 0.65rem 1.2rem;
+    font-size: 0.95rem;
   }
 }

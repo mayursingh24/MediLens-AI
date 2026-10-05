@@ -1,45 +1,37 @@
 {% extends "base.html" %}
 
-{% block title %}Sign In — MediLens AI Platform{% endblock %}
+{% block title %}Log In — MediLens AI{% endblock %}
 
 {% block content %}
-<div style="max-width: 460px; margin: 3.5rem auto 4rem;">
-  
-  <div class="card card-ai-glow" style="padding: 2.75rem 2.25rem; background: linear-gradient(135deg, rgba(12, 17, 32, 0.95) 0%, rgba(16, 22, 44, 0.92) 100%); border-radius: var(--radius-xl); border: 1px solid rgba(0, 229, 255, 0.28);">
-    
-    <div style="text-align: center; margin-bottom: 2.25rem;">
-      <div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.85rem; border-radius: var(--radius-full); background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.25); font-size: 0.72rem; color: var(--primary); font-weight: 800; margin-bottom: 1rem; text-transform: uppercase;">
-        ⚡ Secure Clinical Access
+<div style="max-width: 440px; margin: 3rem auto;">
+  <div class="card card-ai-glow" style="padding: 2.5rem 2rem; background: linear-gradient(135deg, rgba(12, 17, 33, 0.95) 0%, rgba(16, 22, 44, 0.92) 100%); border-radius: var(--radius-xl);">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.65rem; border-radius: 9999px; background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.25); font-size: 0.72rem; color: var(--primary); font-weight: 800; margin-bottom: 0.75rem; text-transform: uppercase;">
+        ⚡ MediLens AI Secure Access
       </div>
-      <h2 style="font-size: 1.85rem; font-weight: 800; color: #FFFFFF; margin-bottom: 0.4rem; letter-spacing: -0.025em;">
-        Welcome Back
-      </h2>
-      <p style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.5;">
-        Sign in to view your prescriptions, active care plans, and daily medication schedules.
-      </p>
+      <h2 style="font-size: 1.75rem; font-weight: 800; color: #FFFFFF; margin-bottom: 0.35rem; letter-spacing: -0.02em;">Welcome Back</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">Sign in to access your prescriptions, AI care plans, and reminders</p>
     </div>
 
     <form method="POST" action="{{ url_for('auth.login') }}">
-      <div class="form-group" style="margin-bottom: 1.5rem;">
+      <div class="form-group">
         <label class="form-label" for="email">Email Address</label>
-        <input type="email" id="email" name="email" class="form-control" placeholder="name@example.com" value="{{ email or '' }}" required autofocus autocomplete="email">
+        <input type="email" id="email" name="email" class="form-control" placeholder="name@example.com" value="{{ email or '' }}" required autofocus>
       </div>
 
-      <div class="form-group" style="margin-bottom: 1.75rem;">
+      <div class="form-group">
         <label class="form-label" for="password">Password</label>
-        <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+        <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
       </div>
 
-      <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; justify-content: center; font-size: 1rem;">
-        Sign In to MediLens &rarr;
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem; padding: 0.7rem;">
+        Sign In
       </button>
     </form>
 
-    <div style="text-align: center; margin-top: 2rem; font-size: 0.88rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
-      Don't have an account yet? <a href="{{ url_for('auth.register') }}" style="font-weight: 700;">Create Free Account</a>
+    <div style="text-align: center; margin-top: 1.5rem; font-size: 0.88rem; color: var(--text-muted);">
+      Don't have an account? <a href="{{ url_for('auth.register') }}">Create Account</a>
     </div>
-
   </div>
-
 </div>
 {% endblock %}
