@@ -1,71 +1,80 @@
 {% extends "base.html" %}
 
-{% block title %}Scan Prescription — MediLens AI Intelligence{% endblock %}
+{% block title %}Analyze Prescription — MediLens AI Clinical Intelligence{% endblock %}
 
 {% block content %}
-<div style="max-width: 760px; margin: 1.5rem auto;">
+<div style="max-width: 820px; margin: 1.5rem auto 3rem;">
+  
+  <!-- Header Eyebrow & Title -->
   <div style="text-align: center; margin-bottom: 2.5rem;">
-    <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.25); padding: 0.3rem 0.8rem; border-radius: var(--radius-full); margin-bottom: 1rem;">
+    <div style="display: inline-flex; align-items: center; gap: 0.45rem; background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.28); padding: 0.35rem 0.95rem; border-radius: var(--radius-full); margin-bottom: 1.25rem;">
       <span class="ai-pulse-dot" style="background: var(--primary);"></span>
-      <span style="color: var(--primary); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;">
+      <span style="color: var(--primary); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;">
         Multimodal Clinical Scanner
       </span>
     </div>
-    <h1 style="font-size: 2.4rem; font-weight: 900; letter-spacing: -0.02em; color: #FFFFFF; margin-bottom: 0.5rem;">
+    <h1 style="font-size: clamp(2.2rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -0.03em; color: #FFFFFF; margin-bottom: 0.65rem;">
       Analyze Prescription
     </h1>
-    <p style="color: var(--text-secondary); font-size: 1.05rem; max-width: 580px; margin: 0 auto;">
-      Upload an image or PDF of your doctor's prescription. Our AI vision and clinical intelligence pipeline will transcribe, verify, and explain every medication.
+    <p style="color: var(--text-secondary); font-size: 1.05rem; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+      Upload an image or PDF of your doctor's prescription. Our AI vision and clinical intelligence pipeline will transcribe, verify, and formulate your complete care plan.
     </p>
   </div>
 
   <!-- Main Upload Card -->
-  <div class="card" id="upload-card-wrapper" style="padding: 2.25rem;">
+  <div class="card card-ai-glow" id="upload-card-wrapper" style="padding: 2.5rem; background: linear-gradient(135deg, rgba(12, 17, 32, 0.95) 0%, rgba(16, 22, 44, 0.9) 100%); border-radius: var(--radius-xl);">
+    
     <form method="POST" action="{{ url_for('prescriptions.upload') }}" enctype="multipart/form-data" id="prescription-upload-form">
-      <!-- Profile Selection -->
-      <div class="form-group" style="margin-bottom: 1.75rem;">
-        <label class="form-label" for="profile_id">
-          Patient Profile (Age & Context):
+      
+      <!-- Patient Profile Selection -->
+      <div class="form-group" style="margin-bottom: 2rem;">
+        <label class="form-label" for="profile_id" style="font-size: 0.88rem; font-weight: 700; color: #FFFFFF; margin-bottom: 0.5rem;">
+          👤 Select Patient Profile:
         </label>
-        <select name="profile_id" id="profile_id" class="form-control" style="font-size: 0.95rem;">
+        <select name="profile_id" id="profile_id" class="form-control" style="font-size: 0.95rem; padding: 0.8rem 1rem; background: rgba(8, 12, 22, 0.9);">
           {% for p in profiles %}
             <option value="{{ p.id }}" {% if active_profile_id and p.id == active_profile_id %}selected{% endif %}>
               {{ p.name }} ({{ p.relationship }}{% if p.age %}, {{ p.age }} yrs{% endif %}{% if p.weight_kg %}, {{ p.weight_kg }} kg{% endif %})
             </option>
           {% endfor %}
         </select>
-        <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem;">
-          💡 Patient age and weight ensure accurate pediatric or geriatric dosage safety checks.
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.45rem; display: flex; align-items: center; gap: 0.4rem;">
+          <span>💡</span> Patient age and weight ensure accurate pediatric or geriatric dosage safety checks.
         </div>
       </div>
 
       <!-- File Dropzone -->
-      <div class="dropzone-container" id="prescription-dropzone">
-        <div class="dropzone-icon">📄</div>
+      <div class="dropzone-container" id="prescription-dropzone" style="border: 2px dashed rgba(0, 229, 255, 0.35); border-radius: var(--radius-lg); padding: 3.5rem 1.5rem; text-align: center; background: rgba(6, 9, 18, 0.6); cursor: pointer; transition: all 0.2s ease;">
+        <div class="dropzone-icon" style="font-size: 3.2rem; margin-bottom: 1rem;">📄</div>
+        
         <div class="dropzone-text">
-          <h3>Drag & Drop prescription file</h3>
-          <p>Supports JPG, JPEG, PNG, WEBP, and multi-page PDF (Max 16 MB)</p>
+          <h3 style="font-size: 1.35rem; font-weight: 800; color: #FFFFFF; margin-bottom: 0.4rem;">
+            Drag & Drop Prescription Document
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.92rem; max-width: 480px; margin: 0 auto;">
+            Supports JPG, JPEG, PNG, WEBP, and multi-page PDF files up to 16 MB.
+          </p>
         </div>
 
         <input type="file" name="prescription_file" id="prescription-file-input" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf" style="display: none;">
 
-        <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
-          <button type="button" class="btn btn-secondary btn-sm" id="browse-btn">
-            📂 Choose File
+        <div class="dropzone-actions" style="margin-top: 1.75rem; display: flex; gap: 0.85rem; justify-content: center; flex-wrap: wrap;">
+          <button type="button" class="btn btn-secondary btn-sm" id="browse-btn" style="padding: 0.6rem 1.4rem;">
+            📂 Browse File
           </button>
-          <button type="button" class="btn btn-secondary btn-sm" id="camera-trigger-btn">
+          <button type="button" class="btn btn-secondary btn-sm" id="camera-trigger-btn" style="padding: 0.6rem 1.4rem;">
             📷 Camera Capture
           </button>
         </div>
       </div>
 
       <!-- File Preview Box -->
-      <div class="file-preview-box" id="file-preview-box" style="display: none; align-items: center; justify-content: space-between; background: rgba(0, 229, 255, 0.06); border: 1px solid rgba(0, 229, 255, 0.2); padding: 1rem 1.25rem; border-radius: var(--radius-md); margin-top: 1.25rem;">
-        <div style="display: flex; align-items: center; gap: 0.75rem;">
-          <span style="font-size: 1.5rem;">📄</span>
+      <div class="file-preview-box" id="file-preview-box" style="display: none; align-items: center; justify-content: space-between; background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.3); padding: 1.15rem 1.35rem; border-radius: var(--radius-md); margin-top: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.85rem;">
+          <span style="font-size: 1.8rem;">📄</span>
           <div>
             <div id="preview-file-name" style="font-weight: 700; color: #FFFFFF; font-size: 0.95rem;"></div>
-            <div id="preview-file-size" style="font-size: 0.78rem; color: var(--text-muted);"></div>
+            <div id="preview-file-size" style="font-size: 0.8rem; color: #38BDF8;"></div>
           </div>
         </div>
         <button type="button" class="btn btn-outline-secondary btn-sm" id="change-file-btn">
@@ -73,15 +82,16 @@
         </button>
       </div>
 
-      <!-- Submit Button -->
-      <div style="margin-top: 2rem;">
-        <button type="submit" id="upload-submit-btn" class="btn btn-primary btn-lg" style="width: 100%; justify-content: center;" disabled>
+      <!-- Submit Action Button -->
+      <div style="margin-top: 2.25rem;">
+        <button type="submit" id="upload-submit-btn" class="btn btn-primary btn-lg" style="width: 100%; justify-content: center; font-size: 1.05rem;" disabled>
           <span>⚡ Start AI Prescription Analysis</span>
         </button>
       </div>
+
     </form>
 
-    <!-- Immersive AI Scanning Screen (Active upon submit) -->
+    <!-- Immersive AI Scanning Screen (Triggered upon submit) -->
     <div id="immersive-ai-scanner" style="display: none;" class="ai-scanner-screen">
       <div class="scanner-beam"></div>
 
@@ -91,11 +101,11 @@
       <div class="scanner-stages-list">
         <div class="scanner-stage-item active" id="stage-vision">
           <span class="stage-icon">◉</span>
-          <span>Vision Analysis (Multimodal Gemini 3.5 Flash)</span>
+          <span>Vision Analysis (Multimodal Gemini 2.5 Flash)</span>
         </div>
         <div class="scanner-stage-item" id="stage-ocr">
           <span class="stage-icon">○</span>
-          <span>Text Recognition & OpenCV Enhancement</span>
+          <span>Text Recognition & Optical Preprocessing</span>
         </div>
         <div class="scanner-stage-item" id="stage-medicine">
           <span class="stage-icon">○</span>
@@ -103,7 +113,7 @@
         </div>
         <div class="scanner-stage-item" id="stage-verification">
           <span class="stage-icon">○</span>
-          <span>Authoritative Medical Verification (OpenFDA / DailyMed)</span>
+          <span>Authoritative Medical Verification (CDSCO / OpenFDA)</span>
         </div>
         <div class="scanner-stage-item" id="stage-context">
           <span class="stage-icon">○</span>
@@ -115,7 +125,7 @@
         </div>
         <div class="scanner-stage-item" id="stage-careplan">
           <span class="stage-icon">○</span>
-          <span>Personal Care Plan & Timeline Synthesis</span>
+          <span>Circadian Care Plan & Adherence Timetable</span>
         </div>
       </div>
 
@@ -123,12 +133,14 @@
         Processing high-resolution prescription elements. Please do not close this window...
       </div>
     </div>
+
   </div>
 
   <!-- Safety Reminder Notice -->
-  <div style="margin-top: 1.75rem; text-align: center; font-size: 0.82rem; color: var(--text-muted); line-height: 1.6;">
+  <div style="margin-top: 2rem; text-align: center; font-size: 0.84rem; color: var(--text-muted); line-height: 1.6;">
     🔒 MediLens uses zero-retention HIPAA-aligned transient memory. If handwriting is illegible or ambiguous, our uncertainty-first design will explicitly flag items for verification.
   </div>
+
 </div>
 {% endblock %}
 

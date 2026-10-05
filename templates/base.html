@@ -50,29 +50,36 @@
         <a href="{{ url_for('assistant.chat') }}" class="nav-link {% if request.endpoint and 'assistant' in request.endpoint %}active{% endif %}">AI Health</a>
         <a href="{{ url_for('profiles.index') }}" class="nav-link {% if request.endpoint and 'profiles' in request.endpoint %}active{% endif %}">Profiles</a>
       </nav>
+      {% else %}
+      <nav class="nav-links">
+        <a href="#how-it-works" class="nav-link">How It Works</a>
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#demoConsole" class="nav-link">Interactive Demo</a>
+        <a href="#clinical-safety" class="nav-link">Safety Standards</a>
+      </nav>
       {% endif %}
 
       <div class="nav-actions">
         <!-- Dual AI Badge -->
-        <span style="font-size: 0.72rem; font-weight: 800; color: #00E5FF; background: rgba(0, 229, 255, 0.1); padding: 0.25rem 0.65rem; border-radius: var(--radius-full); border: 1px solid rgba(0, 229, 255, 0.3); display: inline-flex; align-items: center; gap: 0.3rem;">
-          <span style="width: 6px; height: 6px; border-radius: 50%; background: #00E5FF; box-shadow: 0 0 6px #00E5FF;"></span>
-          Dual AI (Gemini + Groq)
+        <span class="dual-ai-badge" style="font-size: 0.72rem; font-weight: 700; color: #00E5FF; background: rgba(0, 229, 255, 0.08); padding: 0.3rem 0.75rem; border-radius: var(--radius-full); border: 1px solid rgba(0, 229, 255, 0.28); display: inline-flex; align-items: center; gap: 0.4rem;">
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: #00E5FF; box-shadow: 0 0 8px #00E5FF;"></span>
+          <span>Dual AI Engine</span>
         </span>
 
-        <!-- Language Selector -->
-        <select id="global-lang-select" class="form-control" style="width: auto; padding: 0.3rem 0.55rem; font-size: 0.8rem; background: rgba(255,255,255,0.06); border-radius: var(--radius-full);" aria-label="Language selector">
-          <option value="en" {% if preferred_language == 'en' %}selected{% endif %}>English</option>
-          <option value="hi" {% if preferred_language == 'hi' %}selected{% endif %}>हिंदी</option>
-          <option value="hinglish" {% if preferred_language == 'hinglish' %}selected{% endif %}>Hinglish</option>
+        <!-- Global Language Selector -->
+        <select id="global-lang-select" class="form-control" style="width: auto; padding: 0.35rem 0.65rem; font-size: 0.8rem; background: rgba(255,255,255,0.05); border-radius: var(--radius-full); cursor: pointer;" aria-label="Language selector">
+          <option value="en" {% if preferred_language == 'en' %}selected{% endif %}>EN • English</option>
+          <option value="hi" {% if preferred_language == 'hi' %}selected{% endif %}>HI • हिंदी</option>
+          <option value="hinglish" {% if preferred_language == 'hinglish' %}selected{% endif %}>HN • Hinglish</option>
         </select>
 
         {% if session.get('user_id') %}
-          <a href="{{ url_for('profiles.index') }}" class="badge badge-ai" style="font-size: 0.8rem; padding: 0.35rem 0.7rem; text-decoration: none;">
+          <a href="{{ url_for('profiles.index') }}" class="badge badge-ai" style="font-size: 0.8rem; padding: 0.38rem 0.75rem; text-decoration: none;">
             👤 {{ active_user_name or 'Patient' }}
           </a>
-          <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary btn-sm" style="font-size: 0.78rem; padding: 0.35rem 0.65rem;">Logout</a>
+          <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary btn-sm">Logout</a>
         {% else %}
-          <a href="{{ url_for('auth.login') }}" class="btn btn-secondary btn-sm">Log In</a>
+          <a href="{{ url_for('auth.login') }}" class="btn btn-secondary btn-sm">Sign In</a>
           <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Get Started</a>
         {% endif %}
       </div>
@@ -83,10 +90,10 @@
   <main class="main-content">
     {% if request.endpoint != 'dashboard.root' and request.endpoint != 'landing' %}
     <!-- Medical Safety Disclaimer Banner (Shown on internal application pages) -->
-    <div class="card" style="padding: 0.75rem 1.25rem; margin-bottom: 2rem; background: rgba(0, 229, 255, 0.04); border-color: rgba(0, 229, 255, 0.18); font-size: 0.85rem; display: flex; align-items: center; gap: 0.75rem;">
-      <span style="font-size: 1.1rem;">🛡️</span>
-      <span style="color: var(--text-secondary);">
-        <strong>Clinical AI Safeguard:</strong> MediLens AI provides prescription transcription, verified pharmacology data, and personalized schedule timelines. It does not provide medical diagnosis or replace physician consultation. Always confirm treatments with your doctor or pharmacist.
+    <div class="card" style="padding: 0.85rem 1.25rem; margin-bottom: 2rem; background: rgba(0, 229, 255, 0.04); border-color: rgba(0, 229, 255, 0.18); font-size: 0.85rem; display: flex; align-items: center; gap: 0.75rem;">
+      <span style="font-size: 1.2rem; flex-shrink: 0;">🛡️</span>
+      <span style="color: var(--text-secondary); line-height: 1.5;">
+        <strong>Clinical AI Safeguard:</strong> MediLens AI provides automated prescription transcription, verified pharmacology data, and personalized schedule timelines. It does not provide medical diagnosis or replace physician consultation. Always confirm treatments with your doctor or pharmacist.
       </span>
     </div>
     {% endif %}
@@ -121,23 +128,23 @@
   <!-- Mobile Bottom Navigation (Visible on screen <= 768px) -->
   <nav class="mobile-bottom-nav">
     <a href="{{ url_for('dashboard.index') }}" class="mobile-nav-item {% if request.endpoint == 'dashboard.index' %}active{% endif %}">
-      <span class="icon">🏠</span>
+      <span style="font-size: 1.2rem;">🏠</span>
       <span>Home</span>
     </a>
     <a href="{{ url_for('prescriptions.upload') }}" class="mobile-nav-item {% if request.endpoint and 'prescriptions.upload' in request.endpoint %}active{% endif %}">
-      <span class="icon">⚡</span>
-      <span>Scan</span>
+      <span style="font-size: 1.2rem; color: var(--primary);">⚡</span>
+      <span style="color: var(--primary); font-weight: 700;">Scan</span>
     </a>
     <a href="{{ url_for('schedule.index') }}" class="mobile-nav-item {% if request.endpoint and 'schedule' in request.endpoint %}active{% endif %}">
-      <span class="icon">⏱</span>
+      <span style="font-size: 1.2rem;">⏱</span>
       <span>Timeline</span>
     </a>
     <a href="{{ url_for('medicines.index') }}" class="mobile-nav-item {% if request.endpoint and 'medicines' in request.endpoint %}active{% endif %}">
-      <span class="icon">💊</span>
+      <span style="font-size: 1.2rem;">💊</span>
       <span>Meds</span>
     </a>
     <a href="{{ url_for('assistant.chat') }}" class="mobile-nav-item {% if request.endpoint and 'assistant' in request.endpoint %}active{% endif %}">
-      <span class="icon">🤖</span>
+      <span style="font-size: 1.2rem;">🤖</span>
       <span>AI</span>
     </a>
   </nav>
@@ -149,7 +156,7 @@
   </button>
 
   <!-- Slide-Over 'Ask MediLens' Drawer Panel -->
-  <div id="ai-slide-drawer" style="display:none; position:fixed; top:0; right:0; bottom:0; width:100%; max-width:440px; background:rgba(8,12,20,0.95); backdrop-filter:blur(25px); border-left:1px solid var(--border-color); z-index:200; box-shadow:var(--shadow-lg); flex-direction:column;">
+  <div id="ai-slide-drawer" style="display:none; position:fixed; top:0; right:0; bottom:0; width:100%; max-width:440px; background:rgba(8,12,22,0.96); backdrop-filter:blur(25px); border-left:1px solid var(--border-color); z-index:200; box-shadow:var(--shadow-lg); flex-direction:column;">
     <div style="padding:1.25rem 1.5rem; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
       <div style="display:flex; align-items:center; gap:0.5rem;">
         <span style="font-size:1.2rem;">✨</span>
@@ -174,24 +181,114 @@
     </div>
 
     <!-- Drawer Input Form -->
-    <form id="drawer-chat-form" style="padding:1rem; border-top:1px solid var(--border-color); display:flex; gap:0.5rem; align-items:center; background:rgba(12,16,28,0.9);">
+    <form id="drawer-chat-form" style="padding:1rem; border-top:1px solid var(--border-color); display:flex; gap:0.5rem; align-items:center; background:rgba(12,16,28,0.95);">
       <input type="text" id="drawer-chat-input" class="form-control" placeholder="Ask about medicines, timings..." style="font-size:0.88rem;" required autocomplete="off">
-      <button type="submit" class="btn btn-primary btn-sm" style="padding:0.6rem 1rem;">Ask</button>
+      <button type="submit" class="btn btn-primary btn-sm" style="padding:0.6rem 1.1rem;">Ask</button>
     </form>
   </div>
   {% endif %}
 
-  <!-- App Footer -->
-  <footer style="border-top: 1px solid var(--border-color); padding: 2rem 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: auto;">
-    <div style="max-width: 1240px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-      <div style="display:flex; align-items:center; gap:0.5rem;">
-        <span style="font-weight:700; color:#FFFFFF;">MediLens AI</span>
-        <span>•</span>
-        <span>Your prescription, understood.</span>
+  <!-- ====================================================================
+       PREMIUM SAAS FOOTER & DEVELOPER PROFILE
+       ==================================================================== -->
+  <footer style="border-top: 1px solid var(--border-color); background: rgba(4, 6, 12, 0.95); padding: 4rem 1.5rem 3rem; color: var(--text-muted); font-size: 0.88rem; margin-top: auto;">
+    <div style="max-width: 1280px; margin: 0 auto;">
+      
+      <!-- Footer Main Columns -->
+      <div class="footer-content-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 2.5rem; margin-bottom: 3rem;">
+        
+        <!-- Column 1: MediLens AI Brand & Purpose -->
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1rem;">
+            <div class="brand-logo-icon" style="width: 28px; height: 28px; font-size: 0.9rem;">M</div>
+            <span style="font-family: var(--font-display); font-size: 1.15rem; font-weight: 800; color: #FFFFFF;">
+              MediLens<span style="color: var(--primary);">AI</span>
+            </span>
+          </div>
+          <p style="color: var(--text-secondary); line-height: 1.65; font-size: 0.88rem; margin-bottom: 1.25rem;">
+            AI-powered prescription understanding and medicine assistance. Decodes handwriting, structures circadian care plans, and protects patient safety with dual-AI reasoning.
+          </p>
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+            <span class="badge" style="background: rgba(0, 229, 255, 0.08); color: #38BDF8; font-size: 0.72rem;">Gemini 2.5 Flash</span>
+            <span class="badge" style="background: rgba(99, 102, 241, 0.08); color: #A5B4FC; font-size: 0.72rem;">Groq 120B Dual-AI</span>
+            <span class="badge" style="background: rgba(16, 185, 129, 0.08); color: #34D399; font-size: 0.72rem;">PMBJP Jan Aushadhi</span>
+          </div>
+        </div>
+
+        <!-- Column 2: Platform Capabilities -->
+        <div>
+          <h4 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #FFFFFF; margin-bottom: 1rem;">
+            Platform Capabilities
+          </h4>
+          <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.6rem;">
+            <li><a href="{{ url_for('prescriptions.upload') }}" style="color: var(--text-muted); text-decoration: none; transition: color 0.15s ease;">⚡ Prescription Scanner</a></li>
+            <li><a href="{{ url_for('schedule.index') if session.get('user_id') else url_for('auth.login') }}" style="color: var(--text-muted); text-decoration: none;">⏰ 24h Medication Timeline</a></li>
+            <li><a href="{{ url_for('medicines.index') if session.get('user_id') else url_for('auth.login') }}" style="color: var(--text-muted); text-decoration: none;">💊 Pharmacology Directory</a></li>
+            <li><a href="{{ url_for('pharmacy.index') if session.get('user_id') else url_for('auth.login') }}" style="color: var(--text-muted); text-decoration: none;">📍 Jan Aushadhi Kendra Finder</a></li>
+            <li><a href="{{ url_for('assistant.chat') if session.get('user_id') else url_for('auth.login') }}" style="color: var(--text-muted); text-decoration: none;">🤖 AI Health Consultation</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Clinical & Medical Integrity -->
+        <div id="clinical-safety">
+          <h4 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #FFFFFF; margin-bottom: 1rem;">
+            Clinical Standards
+          </h4>
+          <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.6rem; color: var(--text-muted); font-size: 0.85rem;">
+            <li>✓ Indian Pharmacopoeia (IP) Formulation</li>
+            <li>✓ CDSCO National Formulary Integration</li>
+            <li>✓ PMBJP Jan Aushadhi Directives</li>
+            <li>✓ OpenFDA & NIH MedlinePlus Databases</li>
+            <li>✓ Zero-Retention HIPAA-Aligned Processing</li>
+          </ul>
+        </div>
+
+        <!-- Column 4: Developer Profile & Socials -->
+        <div>
+          <h4 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #FFFFFF; margin-bottom: 1rem;">
+            Developer Profile
+          </h4>
+          <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.4rem;">
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #00E5FF, #6366F1); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #05070E; font-size: 0.9rem;">
+                MS
+              </div>
+              <div>
+                <strong style="color: #FFFFFF; font-size: 0.92rem; display: block;">Mayur Singh</strong>
+                <span style="color: var(--primary); font-size: 0.76rem; font-weight: 600;">Full-Stack & Applied AI Engineer</span>
+              </div>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; margin: 0;">
+              Designing high-precision multimodal AI architectures, clinical health-tech software, and delightful human interfaces.
+            </p>
+          </div>
+
+          <!-- Social Links -->
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+            <a href="https://github.com/mayursingh24" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;">
+              <span>🐙 GitHub</span>
+            </a>
+            <a href="https://www.linkedin.com/in/mayursingh24" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;">
+              <span>💼 LinkedIn</span>
+            </a>
+            <a href="mailto:mayursingh24@example.com" class="btn btn-secondary btn-sm" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;">
+              <span>✉️ Contact</span>
+            </a>
+          </div>
+        </div>
+
       </div>
-      <div>
-        <span>Authoritative intelligence from OpenFDA, DailyMed & NIH MedlinePlus</span>
+
+      <!-- Legal Safeguard & Copyright Strip -->
+      <div style="border-top: 1px solid var(--border-subtle); padding-top: 1.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; font-size: 0.8rem; color: var(--text-dim);">
+        <div>
+          <span>&copy; 2026 MediLens AI. Developed by Mayur Singh. All rights reserved.</span>
+        </div>
+        <div style="max-width: 600px; text-align: right; line-height: 1.4;">
+          <span>Notice: MediLens AI is an assistive prescription transcription platform and does not replace certified physician diagnosis.</span>
+        </div>
       </div>
+
     </div>
   </footer>
 
