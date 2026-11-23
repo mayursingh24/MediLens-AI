@@ -1,4 +1,74 @@
-/* Bottom Navigation for Mobile */
+/**
+ * ====================================================================
+ * MEDILENS AI — COMPREHENSIVE RESPONSIVE SUITE
+ * Desktop (1440px, 1280px) • Laptop (1024px-1366px, 125% DPI scale)
+ * Tablet (768px-992px) • Mobile (360px, 375px, 390px, 412px, 480px)
+ * Zero Horizontal Scroll • Fluid Grids • Thumb-Friendly Touch Targets
+ * ====================================================================
+ */
+
+/* --------------------------------------------------------------------
+   1. GLOBAL RESILIENCE & FLUID SYSTEM (ALL SCREENS)
+   -------------------------------------------------------------------- */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+  width: 100%;
+}
+
+img, video, canvas, svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Fluid Table Wrapper */
+.table-responsive-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  max-width: 100%;
+  scrollbar-width: thin;
+}
+
+.table-responsive-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-responsive-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
+/* Result Clinical Summary Grid */
+.result-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.summary-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.15rem;
+}
+
+.summary-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+  font-weight: 700;
+}
+
+.summary-value {
+  font-size: 1.05rem;
+  color: #FFFFFF;
+}
+
+/* Mobile Bottom Navigation Structure */
 .mobile-bottom-nav {
   display: none;
   position: fixed;
@@ -6,20 +76,18 @@
   left: 0;
   right: 0;
   height: 60px;
-  background-color: var(--bg-card);
+  background: rgba(6, 8, 15, 0.94);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
   border-top: 1px solid var(--border-color);
   z-index: 1000;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.mobile-nav-container {
-  display: flex;
-  height: 100%;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6);
   justify-content: space-around;
   align-items: center;
+  padding: 0 0.5rem;
 }
 
-.mobile-nav-link {
+.mobile-nav-item, .mobile-nav-link {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -31,71 +99,456 @@
   flex: 1;
   height: 100%;
   gap: 0.2rem;
+  min-height: 44px;
+  transition: all 0.15s ease;
 }
 
+.mobile-nav-item .icon, .mobile-nav-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.mobile-nav-item.active, .mobile-nav-item:hover,
 .mobile-nav-link.active, .mobile-nav-link:hover {
   color: var(--primary);
 }
 
-.mobile-nav-icon {
-  font-size: 1.15rem;
-}
-
-/* Tablet & Mobile Media Queries */
-@media (max-width: 992px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
+/* --------------------------------------------------------------------
+   2. LAPTOPS & COMPACT DESKTOPS (1024px – 1366px, Windows 125% DPI)
+   -------------------------------------------------------------------- */
+@media (max-width: 1200px) {
+  /* Hide Dual-AI badge in header to prevent navbar collision */
+  .dual-ai-badge {
+    display: none !important;
   }
 
-  .col-8, .col-7, .col-6, .col-5, .col-4 {
-    grid-column: span 12;
-  }
-}
-
-@media (max-width: 768px) {
-  .nav-links {
-    display: none; /* Handled by mobile bottom nav */
-  }
-
-  .mobile-bottom-nav {
-    display: block;
-  }
-
-  body {
-    padding-bottom: 70px; /* Room for bottom navigation */
-  }
-
-  .main-wrapper {
-    margin-top: 1rem;
+  .nav-container {
     padding: 0 1rem;
   }
 
+  .nav-links {
+    gap: 0.15rem;
+  }
+
+  .nav-link {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.65rem;
+  }
+
+  .brand-text {
+    font-size: 1.05rem;
+  }
+
+  .card {
+    padding: 1.4rem;
+  }
+
+  .section-part {
+    padding: 1.2rem 1.3rem;
+  }
+
+  .three-part-layout {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+/* --------------------------------------------------------------------
+   3. TABLETS (769px – 992px)
+   -------------------------------------------------------------------- */
+@media (max-width: 992px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .col-12, .col-8, .col-7, .col-6, .col-5, .col-4 {
+    grid-column: span 12 !important;
+  }
+
+  .bento-grid-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.25rem !important;
+  }
+
+  .bento-grid-container > .card {
+    grid-column: span 2 !important;
+  }
+
+  .three-part-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .section-part:not(:last-child) {
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+  }
+
   .timing-inputs-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 
   .xai-comparison-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
 
+  .dropzone-container {
+    padding: 2.75rem 1.5rem;
+  }
+}
+
+/* --------------------------------------------------------------------
+   4. MOBILES (Max-Width 768px: Tablets down to Phones)
+   -------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  /* Layout & Navigation */
+  body {
+    padding-bottom: 74px !important; /* Never obscure content under bottom bar */
+  }
+
+  .nav-links {
+    display: none !important; /* Replaced by bottom bar */
+  }
+
+  .mobile-bottom-nav {
+    display: flex !important;
+  }
+
+  .dual-ai-badge {
+    display: none !important;
+  }
+
+  .app-header {
+    height: 56px;
+  }
+
+  .nav-container {
+    height: 56px;
+    padding: 0 0.85rem;
+  }
+
+  .brand-logo-icon {
+    width: 26px;
+    height: 26px;
+    font-size: 0.85rem;
+  }
+
+  .brand-text {
+    font-size: 1rem;
+  }
+
+  .main-content {
+    padding: 1.25rem 0.85rem 5rem !important;
+  }
+
+  /* Floating Ask MediLens AI Trigger */
+  .floating-ai-trigger {
+    bottom: 74px !important;
+    right: 0.85rem !important;
+    padding: 0.55rem 0.95rem !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* Slide-Over Drawer: Full width on mobile */
+  #ai-slide-drawer {
+    max-width: 100% !important;
+    width: 100% !important;
+    border-left: none !important;
+  }
+
+  /* Landing Page Hero & Interactive Elements */
+  .hero-eyebrow-badge {
+    white-space: normal !important;
+    text-align: center !important;
+    font-size: 0.72rem !important;
+    padding: 0.35rem 0.75rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .hero-headline {
+    font-size: clamp(1.75rem, 6.2vw, 2.5rem) !important;
+    line-height: 1.2 !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .hero-subhead {
+    font-size: 0.95rem !important;
+    line-height: 1.55 !important;
+    margin-bottom: 1.75rem !important;
+  }
+
+  .hero-cta-buttons, .cta-actions-wrap {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 0.75rem !important;
+  }
+
+  .hero-cta-buttons .btn, .cta-actions-wrap .btn {
+    width: 100% !important;
+    min-height: 48px !important;
+    font-size: 0.95rem !important;
+    justify-content: center !important;
+  }
+
+  .hero-trust-strip {
+    gap: 0.65rem 1rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  /* Demo Console Tabs Bar */
+  .demo-tabs-bar {
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    max-width: 100% !important;
+    -webkit-overflow-scrolling: touch !important;
+    justify-content: flex-start !important;
+    scrollbar-width: none !important;
+  }
+
+  .demo-tabs-bar::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .demo-tab-btn {
+    flex-shrink: 0 !important;
+    font-size: 0.76rem !important;
+    padding: 0.35rem 0.65rem !important;
+  }
+
+  #demoContent-transcription, 
+  #demoContent-pricing, 
+  #demoContent-audio {
+    padding: 1.25rem 1rem !important;
+  }
+
+  .demo-ocr-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
+
+  /* Bento Grid Stack on Mobile */
+  .bento-grid-container {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .bento-grid-container > .card {
+    grid-column: span 1 !important;
+    padding: 1.5rem 1.25rem !important;
+  }
+
+  /* 24-Hour Visual Prescription Map Transformation */
+  .prescription-map-container {
+    padding: 1.25rem 1rem !important;
+  }
+
+  .map-timeline-row::before {
+    display: none !important; /* Hide horizontal connecting line */
+  }
+
+  .map-timeline-row {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  .map-time-slot {
+    width: 100% !important;
+    min-width: 0 !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-lg) !important;
+    padding: 1.15rem 1rem !important;
+    text-align: left !important;
+  }
+
+  .map-time-slot .slot-node {
+    margin: 0 0 0.5rem 0 !important;
+  }
+
+  /* Prescription Result Details */
+  .result-header {
+    padding: 1.15rem 1rem !important;
+  }
+
+  .result-header h2 {
+    font-size: 1.2rem !important;
+    word-break: break-word !important;
+  }
+
+  .result-summary-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Result Action Buttons: 2-column thumb grid */
+  .result-actions-grid, .med-actions-wrap {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+  }
+
+  .result-actions-grid .btn, .med-actions-wrap .btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 0.55rem 0.5rem !important;
+    font-size: 0.78rem !important;
+    min-height: 42px !important;
+  }
+
+  /* Voice Briefing Player */
+  #aiAudioPlayerBar {
+    padding: 1rem !important;
+  }
+
+  #audioSubtitleText {
+    max-width: 100% !important;
+    white-space: normal !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* Prescription Intelligence Cards */
+  .medicine-intel-card {
+    border-radius: var(--radius-lg) !important;
+  }
+
+  .med-header-bar {
+    padding: 1rem 1.15rem !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
+  .med-title-group h3 {
+    font-size: 1.15rem !important;
+  }
+
+  .section-part {
+    padding: 1rem 1.15rem !important;
+  }
+
+  /* Upload Dropzone */
+  #upload-card-wrapper {
+    padding: 1.35rem 1rem !important;
+  }
+
+  .dropzone-container {
+    padding: 2.25rem 1rem !important;
+  }
+
+  .dropzone-icon {
+    font-size: 2.5rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .dropzone-text h3 {
+    font-size: 1.15rem !important;
+  }
+
+  .dropzone-container .btn {
+    min-height: 44px !important;
+  }
+
+  /* Dashboard Adjustments */
   .dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
+  }
+
+  .dashboard-header .btn {
+    width: 100% !important;
+    min-height: 44px !important;
+    justify-content: center !important;
   }
 
   .dose-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.85rem !important;
+    padding: 1rem !important;
   }
 
   .dose-actions {
-    width: 100%;
-    justify-content: flex-end;
+    width: 100% !important;
+    display: flex !important;
+    gap: 0.5rem !important;
+  }
+
+  .dose-actions .btn, .dose-actions .badge {
+    flex: 1 !important;
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Assistant Chat Height for Mobile */
+  #assistant-chat-card, .chat-card-responsive {
+    height: calc(100vh - 240px) !important;
+    min-height: 420px !important;
+  }
+
+  /* Footer on mobile */
+  footer {
+    padding: 1.5rem 1rem !important;
+    font-size: 0.78rem !important;
+  }
+}
+
+/* --------------------------------------------------------------------
+   5. COMPACT MOBILES (Max-Width 480px, e.g. 360px - 412px Phones)
+   -------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+
+  .main-content {
+    padding: 1rem 0.65rem 5.5rem !important;
+  }
+
+  .card {
+    padding: 1.15rem 0.95rem !important;
+    border-radius: var(--radius-md) !important;
+  }
+
+  h1 {
+    font-size: 1.65rem !important;
+  }
+
+  h2 {
+    font-size: 1.35rem !important;
+  }
+
+  h3 {
+    font-size: 1.1rem !important;
+  }
+
+  .btn {
+    padding: 0.55rem 0.85rem !important;
+    font-size: 0.84rem !important;
   }
 
   .btn-lg {
-    padding: 0.65rem 1.2rem;
-    font-size: 0.95rem;
+    padding: 0.75rem 1.25rem !important;
+    font-size: 0.92rem !important;
+  }
+
+  .form-control {
+    font-size: 0.92rem !important;
+    padding: 0.55rem 0.75rem !important;
+  }
+
+  /* Make Result Actions Stack 1-column if extra compact */
+  .result-actions-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .price-intel-box {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .confidence-meter-grid {
+    grid-template-columns: 1fr !important;
   }
 }
